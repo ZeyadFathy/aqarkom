@@ -1,0 +1,54 @@
+.partner {
+    background: url("http://old-api.aqarito.net/images/white-and-red-balloons-907274.jpg");
+    background-size: cover;
+    padding-bottom: 30px;
+}
+
+.partner .overlay {
+    background-color: rgba(200,200,200,0.7);
+}
+
+.partner nav {
+    margin-bottom: 50px;
+}
+
+.partner nav button {
+    float: left;
+    background: #0EB89B;
+    color: #fff;
+    border: none;
+    outline: none;
+    padding: 8px 20px;
+    margin: 20px 0;
+}
+
+.main-search-box.no-shadow {
+    background: transparent;
+}
+
+.working-day .main-search-input {
+    margin-bottom: 20px !important;
+}
+
+.working-day .day {
+    padding: 45px 10px 10px;
+}
+
+.working-day .col-sm-2, .working-day .col-sm-5 {
+    float: right;
+}
+
+.details {
+    padding: 50px 0;
+}
+
+footer {
+    background-color: #0a0302;
+    text-align: center;
+    color: #fff;
+    padding: 10px;
+}
+
+footer p {
+    margin: 0;
+}

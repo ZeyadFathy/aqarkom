@@ -1,0 +1,31 @@
+@font-face {
+    font-family: 'DroidArabicNaskhBold';
+        src: url('../DroidNaskh-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+      }
+
+@font-face {
+    font-family: 'DroidArabicNaskhRegular';
+        src: url('../fonts/DroidNaskh-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+      }
+
+ /* The following rules are deprecated. */ 
+
+@font-face {
+    font-family: 'Droid Arabic Naskh';
+        src: url('../DroidNaskh-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+      }
+
+
+
+@font-face {
+    font-family: 'Droid Arabic Naskh';
+        src: url('../fonts/DroidNaskh-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+      }
