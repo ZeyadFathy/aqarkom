@@ -15,6 +15,8 @@ use Twilio\Values;
 use Twilio\Version;
 
 /**
+ * PLEASE NOTE that this class contains beta products that are subject to change. Use them with caution.
+ *
  * @property string $sid
  * @property string[] $testUsers
  * @property string $url
@@ -25,7 +27,7 @@ class FlowTestUserInstance extends InstanceResource {
      *
      * @param Version $version Version that contains the resource
      * @param mixed[] $payload The response payload
-     * @param string $sid Unique identifier of the flow.
+     * @param string $sid The sid
      */
     public function __construct(Version $version, array $payload, string $sid) {
         parent::__construct($version);
@@ -67,8 +69,7 @@ class FlowTestUserInstance extends InstanceResource {
     /**
      * Update the FlowTestUserInstance
      *
-     * @param string[] $testUsers List of test user identities that can test draft
-     *                            versions of the flow.
+     * @param string[] $testUsers The test_users
      * @return FlowTestUserInstance Updated FlowTestUserInstance
      * @throws TwilioException When an HTTP error occurs.
      */

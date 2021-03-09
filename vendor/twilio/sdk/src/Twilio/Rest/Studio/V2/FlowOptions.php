@@ -12,9 +12,12 @@ namespace Twilio\Rest\Studio\V2;
 use Twilio\Options;
 use Twilio\Values;
 
+/**
+ * PLEASE NOTE that this class contains beta products that are subject to change. Use them with caution.
+ */
 abstract class FlowOptions {
     /**
-     * @param string $commitMessage Description of change made in the revision
+     * @param string $commitMessage Description on change made in the revision
      * @return CreateFlowOptions Options builder
      */
     public static function create(string $commitMessage = Values::NONE): CreateFlowOptions {
@@ -24,7 +27,7 @@ abstract class FlowOptions {
     /**
      * @param string $friendlyName The string that you assigned to describe the Flow
      * @param array $definition JSON representation of flow definition
-     * @param string $commitMessage Description of change made in the revision
+     * @param string $commitMessage Description on change made in the revision
      * @return UpdateFlowOptions Options builder
      */
     public static function update(string $friendlyName = Values::NONE, array $definition = Values::ARRAY_NONE, string $commitMessage = Values::NONE): UpdateFlowOptions {
@@ -34,16 +37,16 @@ abstract class FlowOptions {
 
 class CreateFlowOptions extends Options {
     /**
-     * @param string $commitMessage Description of change made in the revision
+     * @param string $commitMessage Description on change made in the revision
      */
     public function __construct(string $commitMessage = Values::NONE) {
         $this->options['commitMessage'] = $commitMessage;
     }
 
     /**
-     * Description of change made in the revision.
+     * Description on change made in the revision.
      *
-     * @param string $commitMessage Description of change made in the revision
+     * @param string $commitMessage Description on change made in the revision
      * @return $this Fluent Builder
      */
     public function setCommitMessage(string $commitMessage): self {
@@ -66,7 +69,7 @@ class UpdateFlowOptions extends Options {
     /**
      * @param string $friendlyName The string that you assigned to describe the Flow
      * @param array $definition JSON representation of flow definition
-     * @param string $commitMessage Description of change made in the revision
+     * @param string $commitMessage Description on change made in the revision
      */
     public function __construct(string $friendlyName = Values::NONE, array $definition = Values::ARRAY_NONE, string $commitMessage = Values::NONE) {
         $this->options['friendlyName'] = $friendlyName;
@@ -97,9 +100,9 @@ class UpdateFlowOptions extends Options {
     }
 
     /**
-     * Description of change made in the revision.
+     * Description on change made in the revision.
      *
-     * @param string $commitMessage Description of change made in the revision
+     * @param string $commitMessage Description on change made in the revision
      * @return $this Fluent Builder
      */
     public function setCommitMessage(string $commitMessage): self {

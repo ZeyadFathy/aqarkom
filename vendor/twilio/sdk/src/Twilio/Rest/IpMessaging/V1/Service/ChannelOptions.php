@@ -14,10 +14,12 @@ use Twilio\Values;
 
 abstract class ChannelOptions {
     /**
-     * @param string $friendlyName The friendly_name
-     * @param string $uniqueName The unique_name
-     * @param string $attributes The attributes
-     * @param string $type The type
+     * @param string $friendlyName A string to describe the new resource
+     * @param string $uniqueName An application-defined string that uniquely
+     *                           identifies the resource
+     * @param string $attributes A valid JSON string that contains
+     *                           application-specific data
+     * @param string $type The visibility of the channel
      * @return CreateChannelOptions Options builder
      */
     public static function create(string $friendlyName = Values::NONE, string $uniqueName = Values::NONE, string $attributes = Values::NONE, string $type = Values::NONE): CreateChannelOptions {
@@ -25,7 +27,7 @@ abstract class ChannelOptions {
     }
 
     /**
-     * @param string[] $type The type
+     * @param string[] $type The visibility of the channel to read
      * @return ReadChannelOptions Options builder
      */
     public static function read(array $type = Values::ARRAY_NONE): ReadChannelOptions {
@@ -33,9 +35,11 @@ abstract class ChannelOptions {
     }
 
     /**
-     * @param string $friendlyName The friendly_name
-     * @param string $uniqueName The unique_name
-     * @param string $attributes The attributes
+     * @param string $friendlyName A string to describe the resource
+     * @param string $uniqueName An application-defined string that uniquely
+     *                           identifies the resource
+     * @param string $attributes A valid JSON string that contains
+     *                           application-specific data
      * @return UpdateChannelOptions Options builder
      */
     public static function update(string $friendlyName = Values::NONE, string $uniqueName = Values::NONE, string $attributes = Values::NONE): UpdateChannelOptions {
@@ -45,10 +49,12 @@ abstract class ChannelOptions {
 
 class CreateChannelOptions extends Options {
     /**
-     * @param string $friendlyName The friendly_name
-     * @param string $uniqueName The unique_name
-     * @param string $attributes The attributes
-     * @param string $type The type
+     * @param string $friendlyName A string to describe the new resource
+     * @param string $uniqueName An application-defined string that uniquely
+     *                           identifies the resource
+     * @param string $attributes A valid JSON string that contains
+     *                           application-specific data
+     * @param string $type The visibility of the channel
      */
     public function __construct(string $friendlyName = Values::NONE, string $uniqueName = Values::NONE, string $attributes = Values::NONE, string $type = Values::NONE) {
         $this->options['friendlyName'] = $friendlyName;
@@ -58,9 +64,9 @@ class CreateChannelOptions extends Options {
     }
 
     /**
-     * The friendly_name
+     * A descriptive string that you create to describe the new resource. It can be up to 64 characters long.
      *
-     * @param string $friendlyName The friendly_name
+     * @param string $friendlyName A string to describe the new resource
      * @return $this Fluent Builder
      */
     public function setFriendlyName(string $friendlyName): self {
@@ -69,9 +75,10 @@ class CreateChannelOptions extends Options {
     }
 
     /**
-     * The unique_name
+     * An application-defined string that uniquely identifies the resource. It can be used to address the resource in place of the resource's `sid` in the URL. This value must be 64 characters or less in length and be unique within the Service.
      *
-     * @param string $uniqueName The unique_name
+     * @param string $uniqueName An application-defined string that uniquely
+     *                           identifies the resource
      * @return $this Fluent Builder
      */
     public function setUniqueName(string $uniqueName): self {
@@ -80,9 +87,10 @@ class CreateChannelOptions extends Options {
     }
 
     /**
-     * The attributes
+     * A valid JSON string that contains application-specific data.
      *
-     * @param string $attributes The attributes
+     * @param string $attributes A valid JSON string that contains
+     *                           application-specific data
      * @return $this Fluent Builder
      */
     public function setAttributes(string $attributes): self {
@@ -91,9 +99,9 @@ class CreateChannelOptions extends Options {
     }
 
     /**
-     * The type
+     * The visibility of the channel. Can be: `public` or `private` and defaults to `public`.
      *
-     * @param string $type The type
+     * @param string $type The visibility of the channel
      * @return $this Fluent Builder
      */
     public function setType(string $type): self {
@@ -114,16 +122,16 @@ class CreateChannelOptions extends Options {
 
 class ReadChannelOptions extends Options {
     /**
-     * @param string[] $type The type
+     * @param string[] $type The visibility of the channel to read
      */
     public function __construct(array $type = Values::ARRAY_NONE) {
         $this->options['type'] = $type;
     }
 
     /**
-     * The type
+     * The visibility of the Channels to read. Can be: `public` or `private` and defaults to `public`.
      *
-     * @param string[] $type The type
+     * @param string[] $type The visibility of the channel to read
      * @return $this Fluent Builder
      */
     public function setType(array $type): self {
@@ -144,9 +152,11 @@ class ReadChannelOptions extends Options {
 
 class UpdateChannelOptions extends Options {
     /**
-     * @param string $friendlyName The friendly_name
-     * @param string $uniqueName The unique_name
-     * @param string $attributes The attributes
+     * @param string $friendlyName A string to describe the resource
+     * @param string $uniqueName An application-defined string that uniquely
+     *                           identifies the resource
+     * @param string $attributes A valid JSON string that contains
+     *                           application-specific data
      */
     public function __construct(string $friendlyName = Values::NONE, string $uniqueName = Values::NONE, string $attributes = Values::NONE) {
         $this->options['friendlyName'] = $friendlyName;
@@ -155,9 +165,9 @@ class UpdateChannelOptions extends Options {
     }
 
     /**
-     * The friendly_name
+     * A descriptive string that you create to describe the resource. It can be up to 64 characters long.
      *
-     * @param string $friendlyName The friendly_name
+     * @param string $friendlyName A string to describe the resource
      * @return $this Fluent Builder
      */
     public function setFriendlyName(string $friendlyName): self {
@@ -166,9 +176,10 @@ class UpdateChannelOptions extends Options {
     }
 
     /**
-     * The unique_name
+     * An application-defined string that uniquely identifies the resource. It can be used to address the resource in place of the resource's `sid` in the URL. This value must be 64 characters or less in length and be unique within the Service.
      *
-     * @param string $uniqueName The unique_name
+     * @param string $uniqueName An application-defined string that uniquely
+     *                           identifies the resource
      * @return $this Fluent Builder
      */
     public function setUniqueName(string $uniqueName): self {
@@ -177,9 +188,10 @@ class UpdateChannelOptions extends Options {
     }
 
     /**
-     * The attributes
+     * A valid JSON string that contains application-specific data.
      *
-     * @param string $attributes The attributes
+     * @param string $attributes A valid JSON string that contains
+     *                           application-specific data
      * @return $this Fluent Builder
      */
     public function setAttributes(string $attributes): self {

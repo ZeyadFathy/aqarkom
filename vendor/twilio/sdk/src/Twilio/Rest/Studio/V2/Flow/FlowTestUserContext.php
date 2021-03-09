@@ -15,12 +15,15 @@ use Twilio\Serialize;
 use Twilio\Values;
 use Twilio\Version;
 
+/**
+ * PLEASE NOTE that this class contains beta products that are subject to change. Use them with caution.
+ */
 class FlowTestUserContext extends InstanceContext {
     /**
      * Initialize the FlowTestUserContext
      *
      * @param Version $version Version that contains the resource
-     * @param string $sid Unique identifier of the flow.
+     * @param string $sid The sid
      */
     public function __construct(Version $version, $sid) {
         parent::__construct($version);
@@ -46,8 +49,7 @@ class FlowTestUserContext extends InstanceContext {
     /**
      * Update the FlowTestUserInstance
      *
-     * @param string[] $testUsers List of test user identities that can test draft
-     *                            versions of the flow.
+     * @param string[] $testUsers The test_users
      * @return FlowTestUserInstance Updated FlowTestUserInstance
      * @throws TwilioException When an HTTP error occurs.
      */

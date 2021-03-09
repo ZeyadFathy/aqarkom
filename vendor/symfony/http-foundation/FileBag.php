@@ -21,10 +21,10 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class FileBag extends ParameterBag
 {
-    private const FILE_KEYS = ['error', 'name', 'size', 'tmp_name', 'type'];
+    private static $fileKeys = ['error', 'name', 'size', 'tmp_name', 'type'];
 
     /**
-     * @param array|UploadedFile[] $parameters An array of HTTP files
+     * @param array $parameters An array of HTTP files
      */
     public function __construct(array $parameters = [])
     {
@@ -75,16 +75,16 @@ class FileBag extends ParameterBag
             return $file;
         }
 
+        $file = $this->fixPhpFilesArray($file);
         if (\is_array($file)) {
-            $file = $this->fixPhpFilesArray($file);
             $keys = array_keys($file);
             sort($keys);
 
-            if (self::FILE_KEYS == $keys) {
-                if (\UPLOAD_ERR_NO_FILE == $file['error']) {
+            if ($keys == self::$fileKeys) {
+                if (UPLOAD_ERR_NO_FILE == $file['error']) {
                     $file = null;
                 } else {
-                    $file = new UploadedFile($file['tmp_name'], $file['name'], $file['type'], $file['error'], false);
+                    $file = new UploadedFile($file['tmp_name'], $file['name'], $file['type'], $file['error']);
                 }
             } else {
                 $file = array_map([$this, 'convertFileInformation'], $file);
@@ -109,21 +109,23 @@ class FileBag extends ParameterBag
      * It's safe to pass an already converted array, in which case this method
      * just returns the original array unmodified.
      *
-     * @param array $data
-     *
      * @return array
      */
     protected function fixPhpFilesArray($data)
     {
+        if (!\is_array($data)) {
+            return $data;
+        }
+
         $keys = array_keys($data);
         sort($keys);
 
-        if (self::FILE_KEYS != $keys || !isset($data['name']) || !\is_array($data['name'])) {
+        if (self::$fileKeys != $keys || !isset($data['name']) || !\is_array($data['name'])) {
             return $data;
         }
 
         $files = $data;
-        foreach (self::FILE_KEYS as $k) {
+        foreach (self::$fileKeys as $k) {
             unset($files[$k]);
         }
 

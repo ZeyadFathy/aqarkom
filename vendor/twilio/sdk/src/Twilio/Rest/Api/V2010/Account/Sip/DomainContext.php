@@ -88,8 +88,6 @@ class DomainContext extends InstanceContext {
             'DomainName' => $options['domainName'],
             'EmergencyCallingEnabled' => Serialize::booleanToString($options['emergencyCallingEnabled']),
             'Secure' => Serialize::booleanToString($options['secure']),
-            'ByocTrunkSid' => $options['byocTrunkSid'],
-            'EmergencyCallerSid' => $options['emergencyCallerSid'],
         ]);
 
         $payload = $this->version->update('POST', $this->uri, [], $data);

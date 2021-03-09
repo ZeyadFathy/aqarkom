@@ -219,7 +219,10 @@ abstract class ParserAbstract implements Parser
                         ));
                     }
 
-                    // Allow productions to access the start attributes of the lookahead token.
+                    // This is necessary to assign some meaningful attributes to /* empty */ productions. They'll get
+                    // the attributes of the next token, even though they don't contain it themselves.
+                    $this->startAttributeStack[$stackPos+1] = $startAttributes;
+                    $this->endAttributeStack[$stackPos+1] = $endAttributes;
                     $this->lookaheadStartAttributes = $startAttributes;
 
                     //$this->traceRead($symbol);
@@ -291,8 +294,7 @@ abstract class ParserAbstract implements Parser
 
                     /* Goto - shift nonterminal */
                     $lastEndAttributes = $this->endAttributeStack[$stackPos];
-                    $ruleLength = $this->ruleToLength[$rule];
-                    $stackPos -= $ruleLength;
+                    $stackPos -= $this->ruleToLength[$rule];
                     $nonTerminal = $this->ruleToNonTerminal[$rule];
                     $idx = $this->gotoBase[$nonTerminal] + $stateStack[$stackPos];
                     if ($idx >= 0 && $idx < $this->gotoTableSize && $this->gotoCheck[$idx] === $nonTerminal) {
@@ -305,10 +307,6 @@ abstract class ParserAbstract implements Parser
                     $stateStack[$stackPos]     = $state;
                     $this->semStack[$stackPos] = $this->semValue;
                     $this->endAttributeStack[$stackPos] = $lastEndAttributes;
-                    if ($ruleLength === 0) {
-                        // Empty productions use the start attributes of the lookahead token.
-                        $this->startAttributeStack[$stackPos] = $this->lookaheadStartAttributes;
-                    }
                 } else {
                     /* error */
                     switch ($this->errorState) {
@@ -342,7 +340,6 @@ abstract class ParserAbstract implements Parser
 
                             // We treat the error symbol as being empty, so we reset the end attributes
                             // to the end attributes of the last non-error symbol
-                            $this->startAttributeStack[$stackPos] = $this->lookaheadStartAttributes;
                             $this->endAttributeStack[$stackPos] = $this->endAttributeStack[$stackPos - 1];
                             $this->endAttributes = $this->endAttributeStack[$stackPos - 1];
                             break;
@@ -651,7 +648,7 @@ abstract class ParserAbstract implements Parser
     }
 
     protected function handleBuiltinTypes(Name $name) {
-        $builtinTypes = [
+        $scalarTypes = [
             'bool'     => true,
             'int'      => true,
             'float'    => true,
@@ -659,9 +656,6 @@ abstract class ParserAbstract implements Parser
             'iterable' => true,
             'void'     => true,
             'object'   => true,
-            'null'     => true,
-            'false'    => true,
-            'mixed'    => true,
         ];
 
         if (!$name->isUnqualified()) {
@@ -669,7 +663,7 @@ abstract class ParserAbstract implements Parser
         }
 
         $lowerName = $name->toLowerString();
-        if (!isset($builtinTypes[$lowerName])) {
+        if (!isset($scalarTypes[$lowerName])) {
             return $name;
         }
 
@@ -845,34 +839,6 @@ abstract class ParserAbstract implements Parser
         }
     }
 
-    /**
-     * Create attributes for a zero-length common-capturing nop.
-     *
-     * @param Comment[] $comments
-     * @return array
-     */
-    protected function createCommentNopAttributes(array $comments) {
-        $comment = $comments[count($comments) - 1];
-        $commentEndLine = $comment->getEndLine();
-        $commentEndFilePos = $comment->getEndFilePos();
-        $commentEndTokenPos = $comment->getEndTokenPos();
-
-        $attributes = ['comments' => $comments];
-        if (-1 !== $commentEndLine) {
-            $attributes['startLine'] = $commentEndLine;
-            $attributes['endLine'] = $commentEndLine;
-        }
-        if (-1 !== $commentEndFilePos) {
-            $attributes['startFilePos'] = $commentEndFilePos + 1;
-            $attributes['endFilePos'] = $commentEndFilePos;
-        }
-        if (-1 !== $commentEndTokenPos) {
-            $attributes['startTokenPos'] = $commentEndTokenPos + 1;
-            $attributes['endTokenPos'] = $commentEndTokenPos;
-        }
-        return $attributes;
-    }
-
     protected function checkModifier($a, $b, $modifierPos) {
         // Jumping through some hoops here because verifyModifier() is also used elsewhere
         try {
@@ -901,6 +867,13 @@ abstract class ParserAbstract implements Parser
     }
 
     protected function checkNamespace(Namespace_ $node) {
+        if ($node->name && $node->name->isSpecialClassName()) {
+            $this->emitError(new Error(
+                sprintf('Cannot use \'%s\' as namespace name', $node->name),
+                $node->name->getAttributes()
+            ));
+        }
+
         if (null !== $node->stmts) {
             foreach ($node->stmts as $stmt) {
                 if ($stmt instanceof Namespace_) {

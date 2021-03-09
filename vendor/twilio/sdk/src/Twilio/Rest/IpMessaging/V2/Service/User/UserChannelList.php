@@ -19,8 +19,9 @@ class UserChannelList extends ListResource {
      * Construct the UserChannelList
      *
      * @param Version $version Version that contains the resource
-     * @param string $serviceSid The service_sid
-     * @param string $userSid The user_sid
+     * @param string $serviceSid The SID of the Service that the resource is
+     *                           associated with
+     * @param string $userSid The SID of the User the User Channel belongs to
      */
     public function __construct(Version $version, string $serviceSid, string $userSid) {
         parent::__construct($version);
@@ -112,7 +113,8 @@ class UserChannelList extends ListResource {
     /**
      * Constructs a UserChannelContext
      *
-     * @param string $channelSid The channel_sid
+     * @param string $channelSid The SID of the Channel that has the User Channel
+     *                           to fetch
      */
     public function getContext(string $channelSid): UserChannelContext {
         return new UserChannelContext(

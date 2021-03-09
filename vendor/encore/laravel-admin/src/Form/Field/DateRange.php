@@ -20,7 +20,7 @@ class DateRange extends Field
     /**
      * Column name.
      *
-     * @var array
+     * @var string
      */
     protected $column = [];
 
@@ -36,9 +36,6 @@ class DateRange extends Field
         $this->options(['format' => $this->format]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function prepare($value)
     {
         if ($value === '') {

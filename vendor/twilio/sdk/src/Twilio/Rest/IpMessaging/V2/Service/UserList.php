@@ -21,7 +21,8 @@ class UserList extends ListResource {
      * Construct the UserList
      *
      * @param Version $version Version that contains the resource
-     * @param string $serviceSid The service_sid
+     * @param string $serviceSid The SID of the Service that the resource is
+     *                           associated with
      */
     public function __construct(Version $version, string $serviceSid) {
         parent::__construct($version);
@@ -35,7 +36,8 @@ class UserList extends ListResource {
     /**
      * Create the UserInstance
      *
-     * @param string $identity The identity
+     * @param string $identity The `identity` value that identifies the new
+     *                         resource's User
      * @param array|Options $options Optional Arguments
      * @return UserInstance Created UserInstance
      * @throws TwilioException When an HTTP error occurs.
@@ -137,7 +139,7 @@ class UserList extends ListResource {
     /**
      * Constructs a UserContext
      *
-     * @param string $sid The sid
+     * @param string $sid The SID of the User resource to fetch
      */
     public function getContext(string $sid): UserContext {
         return new UserContext($this->version, $this->solution['serviceSid'], $sid);

@@ -23,13 +23,17 @@ abstract class ChannelOptions {
     }
 
     /**
-     * @param string $friendlyName The friendly_name
-     * @param string $uniqueName The unique_name
-     * @param string $attributes The attributes
-     * @param string $type The type
-     * @param \DateTime $dateCreated The date_created
-     * @param \DateTime $dateUpdated The date_updated
-     * @param string $createdBy The created_by
+     * @param string $friendlyName A string to describe the new resource
+     * @param string $uniqueName An application-defined string that uniquely
+     *                           identifies the Channel resource
+     * @param string $attributes A valid JSON string that contains
+     *                           application-specific data
+     * @param string $type The visibility of the channel
+     * @param \DateTime $dateCreated The ISO 8601 date and time in GMT when the
+     *                               resource was created
+     * @param \DateTime $dateUpdated The ISO 8601 date and time in GMT when the
+     *                               resource was updated
+     * @param string $createdBy The identity of the User that created the Channel
      * @param string $xTwilioWebhookEnabled The X-Twilio-Webhook-Enabled HTTP
      *                                      request header
      * @return CreateChannelOptions Options builder
@@ -39,7 +43,7 @@ abstract class ChannelOptions {
     }
 
     /**
-     * @param string[] $type The type
+     * @param string[] $type The visibility of the channel to read
      * @return ReadChannelOptions Options builder
      */
     public static function read(array $type = Values::ARRAY_NONE): ReadChannelOptions {
@@ -47,12 +51,16 @@ abstract class ChannelOptions {
     }
 
     /**
-     * @param string $friendlyName The friendly_name
-     * @param string $uniqueName The unique_name
-     * @param string $attributes The attributes
-     * @param \DateTime $dateCreated The date_created
-     * @param \DateTime $dateUpdated The date_updated
-     * @param string $createdBy The created_by
+     * @param string $friendlyName A string to describe the resource
+     * @param string $uniqueName An application-defined string that uniquely
+     *                           identifies the resource
+     * @param string $attributes A valid JSON string that contains
+     *                           application-specific data
+     * @param \DateTime $dateCreated The ISO 8601 date and time in GMT when the
+     *                               resource was created
+     * @param \DateTime $dateUpdated The ISO 8601 date and time in GMT when the
+     *                               resource was updated
+     * @param string $createdBy The identity of the User that created the Channel
      * @param string $xTwilioWebhookEnabled The X-Twilio-Webhook-Enabled HTTP
      *                                      request header
      * @return UpdateChannelOptions Options builder
@@ -96,13 +104,17 @@ class DeleteChannelOptions extends Options {
 
 class CreateChannelOptions extends Options {
     /**
-     * @param string $friendlyName The friendly_name
-     * @param string $uniqueName The unique_name
-     * @param string $attributes The attributes
-     * @param string $type The type
-     * @param \DateTime $dateCreated The date_created
-     * @param \DateTime $dateUpdated The date_updated
-     * @param string $createdBy The created_by
+     * @param string $friendlyName A string to describe the new resource
+     * @param string $uniqueName An application-defined string that uniquely
+     *                           identifies the Channel resource
+     * @param string $attributes A valid JSON string that contains
+     *                           application-specific data
+     * @param string $type The visibility of the channel
+     * @param \DateTime $dateCreated The ISO 8601 date and time in GMT when the
+     *                               resource was created
+     * @param \DateTime $dateUpdated The ISO 8601 date and time in GMT when the
+     *                               resource was updated
+     * @param string $createdBy The identity of the User that created the Channel
      * @param string $xTwilioWebhookEnabled The X-Twilio-Webhook-Enabled HTTP
      *                                      request header
      */
@@ -118,9 +130,9 @@ class CreateChannelOptions extends Options {
     }
 
     /**
-     * The friendly_name
+     * A descriptive string that you create to describe the new resource. It can be up to 64 characters long.
      *
-     * @param string $friendlyName The friendly_name
+     * @param string $friendlyName A string to describe the new resource
      * @return $this Fluent Builder
      */
     public function setFriendlyName(string $friendlyName): self {
@@ -129,9 +141,10 @@ class CreateChannelOptions extends Options {
     }
 
     /**
-     * The unique_name
+     * An application-defined string that uniquely identifies the resource. It can be used to address the resource in place of the Channel resource's `sid` in the URL. This value must be 64 characters or less in length and be unique within the Service.
      *
-     * @param string $uniqueName The unique_name
+     * @param string $uniqueName An application-defined string that uniquely
+     *                           identifies the Channel resource
      * @return $this Fluent Builder
      */
     public function setUniqueName(string $uniqueName): self {
@@ -140,9 +153,10 @@ class CreateChannelOptions extends Options {
     }
 
     /**
-     * The attributes
+     * A valid JSON string that contains application-specific data.
      *
-     * @param string $attributes The attributes
+     * @param string $attributes A valid JSON string that contains
+     *                           application-specific data
      * @return $this Fluent Builder
      */
     public function setAttributes(string $attributes): self {
@@ -151,9 +165,9 @@ class CreateChannelOptions extends Options {
     }
 
     /**
-     * The type
+     * The visibility of the channel. Can be: `public` or `private` and defaults to `public`.
      *
-     * @param string $type The type
+     * @param string $type The visibility of the channel
      * @return $this Fluent Builder
      */
     public function setType(string $type): self {
@@ -162,9 +176,10 @@ class CreateChannelOptions extends Options {
     }
 
     /**
-     * The date_created
+     * The date, specified in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format, to assign to the resource as the date it was created. The default value is the current time set by the Chat service.  Note that this should only be used in cases where a Channel is being recreated from a backup/separate source.
      *
-     * @param \DateTime $dateCreated The date_created
+     * @param \DateTime $dateCreated The ISO 8601 date and time in GMT when the
+     *                               resource was created
      * @return $this Fluent Builder
      */
     public function setDateCreated(\DateTime $dateCreated): self {
@@ -173,9 +188,10 @@ class CreateChannelOptions extends Options {
     }
 
     /**
-     * The date_updated
+     * The date, specified in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format, to assign to the resource as the date it was last updated. The default value is `null`. Note that this parameter should only be used in cases where a Channel is being recreated from a backup/separate source  and where a Message was previously updated.
      *
-     * @param \DateTime $dateUpdated The date_updated
+     * @param \DateTime $dateUpdated The ISO 8601 date and time in GMT when the
+     *                               resource was updated
      * @return $this Fluent Builder
      */
     public function setDateUpdated(\DateTime $dateUpdated): self {
@@ -184,9 +200,9 @@ class CreateChannelOptions extends Options {
     }
 
     /**
-     * The created_by
+     * The `identity` of the User that created the channel. Default is: `system`.
      *
-     * @param string $createdBy The created_by
+     * @param string $createdBy The identity of the User that created the Channel
      * @return $this Fluent Builder
      */
     public function setCreatedBy(string $createdBy): self {
@@ -219,16 +235,16 @@ class CreateChannelOptions extends Options {
 
 class ReadChannelOptions extends Options {
     /**
-     * @param string[] $type The type
+     * @param string[] $type The visibility of the channel to read
      */
     public function __construct(array $type = Values::ARRAY_NONE) {
         $this->options['type'] = $type;
     }
 
     /**
-     * The type
+     * The visibility of the Channels to read. Can be: `public` or `private` and defaults to `public`.
      *
-     * @param string[] $type The type
+     * @param string[] $type The visibility of the channel to read
      * @return $this Fluent Builder
      */
     public function setType(array $type): self {
@@ -249,12 +265,16 @@ class ReadChannelOptions extends Options {
 
 class UpdateChannelOptions extends Options {
     /**
-     * @param string $friendlyName The friendly_name
-     * @param string $uniqueName The unique_name
-     * @param string $attributes The attributes
-     * @param \DateTime $dateCreated The date_created
-     * @param \DateTime $dateUpdated The date_updated
-     * @param string $createdBy The created_by
+     * @param string $friendlyName A string to describe the resource
+     * @param string $uniqueName An application-defined string that uniquely
+     *                           identifies the resource
+     * @param string $attributes A valid JSON string that contains
+     *                           application-specific data
+     * @param \DateTime $dateCreated The ISO 8601 date and time in GMT when the
+     *                               resource was created
+     * @param \DateTime $dateUpdated The ISO 8601 date and time in GMT when the
+     *                               resource was updated
+     * @param string $createdBy The identity of the User that created the Channel
      * @param string $xTwilioWebhookEnabled The X-Twilio-Webhook-Enabled HTTP
      *                                      request header
      */
@@ -269,9 +289,9 @@ class UpdateChannelOptions extends Options {
     }
 
     /**
-     * The friendly_name
+     * A descriptive string that you create to describe the resource. It can be up to 256 characters long.
      *
-     * @param string $friendlyName The friendly_name
+     * @param string $friendlyName A string to describe the resource
      * @return $this Fluent Builder
      */
     public function setFriendlyName(string $friendlyName): self {
@@ -280,9 +300,10 @@ class UpdateChannelOptions extends Options {
     }
 
     /**
-     * The unique_name
+     * An application-defined string that uniquely identifies the resource. It can be used to address the resource in place of the resource's `sid` in the URL. This value must be 256 characters or less in length and unique within the Service.
      *
-     * @param string $uniqueName The unique_name
+     * @param string $uniqueName An application-defined string that uniquely
+     *                           identifies the resource
      * @return $this Fluent Builder
      */
     public function setUniqueName(string $uniqueName): self {
@@ -291,9 +312,10 @@ class UpdateChannelOptions extends Options {
     }
 
     /**
-     * The attributes
+     * A valid JSON string that contains application-specific data.
      *
-     * @param string $attributes The attributes
+     * @param string $attributes A valid JSON string that contains
+     *                           application-specific data
      * @return $this Fluent Builder
      */
     public function setAttributes(string $attributes): self {
@@ -302,9 +324,10 @@ class UpdateChannelOptions extends Options {
     }
 
     /**
-     * The date_created
+     * The date, specified in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format, to assign to the resource as the date it was created. The default value is the current time set by the Chat service.  Note that this should only be used in cases where a Channel is being recreated from a backup/separate source.
      *
-     * @param \DateTime $dateCreated The date_created
+     * @param \DateTime $dateCreated The ISO 8601 date and time in GMT when the
+     *                               resource was created
      * @return $this Fluent Builder
      */
     public function setDateCreated(\DateTime $dateCreated): self {
@@ -313,9 +336,10 @@ class UpdateChannelOptions extends Options {
     }
 
     /**
-     * The date_updated
+     * The date, specified in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format, to assign to the resource as the date it was last updated.
      *
-     * @param \DateTime $dateUpdated The date_updated
+     * @param \DateTime $dateUpdated The ISO 8601 date and time in GMT when the
+     *                               resource was updated
      * @return $this Fluent Builder
      */
     public function setDateUpdated(\DateTime $dateUpdated): self {
@@ -324,9 +348,9 @@ class UpdateChannelOptions extends Options {
     }
 
     /**
-     * The created_by
+     * The `identity` of the User that created the channel. Default is: `system`.
      *
-     * @param string $createdBy The created_by
+     * @param string $createdBy The identity of the User that created the Channel
      * @return $this Fluent Builder
      */
     public function setCreatedBy(string $createdBy): self {

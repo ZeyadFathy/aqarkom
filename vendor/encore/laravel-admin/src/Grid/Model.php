@@ -10,7 +10,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Str;
 
@@ -93,28 +95,38 @@ class Model
     protected $relation;
 
     /**
+     * @var array
+     */
+    protected $eagerLoads = [];
+
+    /**
      * Create a new grid model instance.
      *
      * @param EloquentModel $model
-     * @param Grid          $grid
      */
-    public function __construct(EloquentModel $model, Grid $grid = null)
+    public function __construct(EloquentModel $model)
     {
         $this->model = $model;
 
         $this->originalModel = $model;
 
-        $this->grid = $grid;
-
         $this->queries = collect();
+
+//        static::doNotSnakeAttributes($this->model);
     }
 
     /**
-     * @return EloquentModel
+     * Don't snake case attributes.
+     *
+     * @param EloquentModel $model
+     *
+     * @return void
      */
-    public function getOriginalModel()
+    protected static function doNotSnakeAttributes(EloquentModel $model)
     {
-        return $this->originalModel;
+        $class = get_class($model);
+
+        $class::$snakeAttributes = false;
     }
 
     /**
@@ -157,32 +169,6 @@ class Model
     public function setPerPageName($name)
     {
         $this->perPageName = $name;
-
-        return $this;
-    }
-
-    /**
-     * Get per-page number.
-     *
-     * @return int
-     */
-    public function getPerPage()
-    {
-        return $this->perPage;
-    }
-
-    /**
-     * Set per-page number.
-     *
-     * @param int $perPage
-     *
-     * @return $this
-     */
-    public function setPerPage($perPage)
-    {
-        $this->perPage = $perPage;
-
-        $this->__call('paginate', [$perPage]);
 
         return $this;
     }
@@ -372,7 +358,7 @@ class Model
         }
 
         if ($this->relation) {
-            $this->model = $this->relation;
+            $this->model = $this->relation->getQuery();
         }
 
         $this->setSort();
@@ -472,7 +458,7 @@ class Model
      */
     protected function resolvePerPage($paginate)
     {
-        if ($perPage = request($this->perPageName)) {
+        if ($perPage = app('request')->input($this->perPageName)) {
             if (is_array($paginate)) {
                 $paginate['arguments'][0] = (int) $perPage;
 
@@ -487,7 +473,7 @@ class Model
         }
 
         if ($name = $this->grid->getName()) {
-            return [$this->perPage, ['*'], "{$name}_page"];
+            return [$this->perPage, null, "{$name}_page"];
         }
 
         return [$this->perPage];
@@ -514,48 +500,23 @@ class Model
      */
     protected function setSort()
     {
-        $this->sort = \request($this->sortName, []);
+        $this->sort = Input::get($this->sortName, []);
         if (!is_array($this->sort)) {
             return;
         }
 
-        $columnName = $this->sort['column'] ?? null;
-        if ($columnName === null || empty($this->sort['type'])) {
+        if (empty($this->sort['column']) || empty($this->sort['type'])) {
             return;
         }
 
-        $columnNameContainsDots = Str::contains($columnName, '.');
-        $isRelation = $this->queries->contains(function ($query) use ($columnName) {
-            return $query['method'] === 'with' && in_array($columnName, $query['arguments'], true);
-        });
-        if ($columnNameContainsDots === true && $isRelation) {
-            $this->setRelationSort($columnName);
+        if (str_contains($this->sort['column'], '.')) {
+            $this->setRelationSort($this->sort['column']);
         } else {
             $this->resetOrderBy();
 
-            if ($columnNameContainsDots === true) {
-                //json
-                $this->resetOrderBy();
-                $explodedCols = explode('.', $this->sort['column']);
-                $col = array_shift($explodedCols);
-                $parts = implode('.', $explodedCols);
-                $columnName = "JSON_EXTRACT({$col}, '$.{$parts}')";
-            }
-
-            // get column. if contains "cast", set set column as cast
-            if (!empty($this->sort['cast'])) {
-                $column = "CAST({$columnName} AS {$this->sort['cast']}) {$this->sort['type']}";
-                $method = 'orderByRaw';
-                $arguments = [$column];
-            } else {
-                $column = $columnName;
-                $method = 'orderBy';
-                $arguments = [$column, $this->sort['type']];
-            }
-
             $this->queries->push([
-                'method'    => $method,
-                'arguments' => $arguments,
+                'method'    => 'orderBy',
+                'arguments' => [$this->sort['column'], $this->sort['type']],
             ]);
         }
     }
@@ -626,11 +587,9 @@ class Model
         $relatedTable = $relation->getRelated()->getTable();
 
         if ($relation instanceof BelongsTo) {
-            $foreignKeyMethod = version_compare(app()->version(), '5.8.0', '<') ? 'getForeignKey' : 'getForeignKeyName';
-
             return [
                 $relatedTable,
-                $relation->{$foreignKeyMethod}(),
+                $relation->getForeignKey(),
                 '=',
                 $relatedTable.'.'.$relation->getRelated()->getKeyName(),
             ];
@@ -662,6 +621,42 @@ class Model
         ]);
 
         return $this;
+    }
+
+    /**
+     * Set the relationships that should be eager loaded.
+     *
+     * @param mixed $relations
+     *
+     * @return $this|Model
+     */
+    public function with($relations)
+    {
+        if (is_array($relations)) {
+            if (Arr::isAssoc($relations)) {
+                $relations = array_keys($relations);
+            }
+
+            $this->eagerLoads = array_merge($this->eagerLoads, $relations);
+        }
+
+        if (is_string($relations)) {
+            if (Str::contains($relations, '.')) {
+                $relations = explode('.', $relations)[0];
+            }
+
+            if (Str::contains($relations, ':')) {
+                $relations = explode(':', $relations)[0];
+            }
+
+            if (in_array($relations, $this->eagerLoads)) {
+                return $this;
+            }
+
+            $this->eagerLoads[] = $relations;
+        }
+
+        return $this->__call('with', (array) $relations);
     }
 
     /**

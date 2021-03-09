@@ -21,8 +21,9 @@ class UserBindingList extends ListResource {
      * Construct the UserBindingList
      *
      * @param Version $version Version that contains the resource
-     * @param string $serviceSid The service_sid
-     * @param string $userSid The user_sid
+     * @param string $serviceSid The SID of the Service that the resource is
+     *                           associated with
+     * @param string $userSid The SID of the User with the binding
      */
     public function __construct(Version $version, string $serviceSid, string $userSid) {
         parent::__construct($version);
@@ -124,7 +125,7 @@ class UserBindingList extends ListResource {
     /**
      * Constructs a UserBindingContext
      *
-     * @param string $sid The sid
+     * @param string $sid The SID of the User Binding resource to fetch
      */
     public function getContext(string $sid): UserBindingContext {
         return new UserBindingContext(

@@ -59,8 +59,8 @@ class OAuthServerException extends Exception
         $this->hint = $hint;
         $this->redirectUri = $redirectUri;
         $this->payload = [
-            'error'             => $errorType,
-            'error_description' => $message,
+            'error'   => $errorType,
+            'message' => $message,
         ];
         if ($hint !== null) {
             $this->payload['hint'] = $hint;
@@ -74,15 +74,7 @@ class OAuthServerException extends Exception
      */
     public function getPayload()
     {
-        $payload = $this->payload;
-
-        // The "message" property is deprecated and replaced by "error_description"
-        // TODO: remove "message" property
-        if (isset($payload['error_description']) && !isset($payload['message'])) {
-            $payload['message'] = $payload['error_description'];
-        }
-
-        return $payload;
+        return $this->payload;
     }
 
     /**

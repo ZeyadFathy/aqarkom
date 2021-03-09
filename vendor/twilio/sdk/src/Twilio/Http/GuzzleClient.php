@@ -8,7 +8,6 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Psr7\Request;
 use Twilio\Exceptions\HttpException;
-use function GuzzleHttp\Psr7\build_query;
 
 final class GuzzleClient implements Client {
     /**
@@ -25,12 +24,10 @@ final class GuzzleClient implements Client {
                             string $user = null, string $password = null,
                             int $timeout = null): Response {
         try {
-            $body = build_query($data, PHP_QUERY_RFC1738);
-
             $options = [
                 'timeout' => $timeout,
                 'auth' => [$user, $password],
-                'body' => $body,
+                'form_params' => $data,
             ];
 
             if ($params) {
@@ -43,7 +40,6 @@ final class GuzzleClient implements Client {
         } catch (\Exception $exception) {
             throw new HttpException('Unable to complete the HTTP request', 0, $exception);
         }
-
         // Casting the body (stream) to a string performs a rewind, ensuring we return the entire response.
         // See https://stackoverflow.com/a/30549372/86696
         return new Response($response->getStatusCode(), (string)$response->getBody(), $response->getHeaders());

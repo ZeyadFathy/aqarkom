@@ -19,6 +19,8 @@ use Twilio\Values;
 use Twilio\Version;
 
 /**
+ * PLEASE NOTE that this class contains beta products that are subject to change. Use them with caution.
+ *
  * @property DocumentPermissionList $documentPermissions
  * @method \Twilio\Rest\Sync\V1\Service\Document\DocumentPermissionContext documentPermissions(string $identity)
  */
@@ -62,11 +64,16 @@ class DocumentContext extends InstanceContext {
     /**
      * Delete the DocumentInstance
      *
+     * @param array|Options $options Optional Arguments
      * @return bool True if delete succeeds, false otherwise
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function delete(): bool {
-        return $this->version->delete('DELETE', $this->uri);
+    public function delete(array $options = []): bool {
+        $options = new Values($options);
+
+        $headers = Values::of(['If-Match' => $options['ifMatch'], ]);
+
+        return $this->version->delete('DELETE', $this->uri, [], [], $headers);
     }
 
     /**

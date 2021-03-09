@@ -47,7 +47,7 @@ class TrunkList extends ListResource {
             'DomainName' => $options['domainName'],
             'DisasterRecoveryUrl' => $options['disasterRecoveryUrl'],
             'DisasterRecoveryMethod' => $options['disasterRecoveryMethod'],
-            'TransferMode' => $options['transferMode'],
+            'Recording' => $options['recording'],
             'Secure' => Serialize::booleanToString($options['secure']),
             'CnamLookupEnabled' => Serialize::booleanToString($options['cnamLookupEnabled']),
         ]);

@@ -37,7 +37,7 @@ class ServiceContext extends InstanceContext {
      * Initialize the ServiceContext
      *
      * @param Version $version Version that contains the resource
-     * @param string $sid The sid
+     * @param string $sid The unique string that identifies the resource
      */
     public function __construct(Version $version, $sid) {
         parent::__construct($version);

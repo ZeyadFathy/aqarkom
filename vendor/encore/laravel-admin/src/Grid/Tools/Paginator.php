@@ -4,6 +4,7 @@ namespace Encore\Admin\Grid\Tools;
 
 use Encore\Admin\Grid;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Input;
 
 class Paginator extends AbstractTool
 {
@@ -13,19 +14,13 @@ class Paginator extends AbstractTool
     protected $paginator = null;
 
     /**
-     * @var bool
-     */
-    protected $perPageSelector = true;
-
-    /**
      * Create a new Paginator instance.
      *
      * @param Grid $grid
      */
-    public function __construct(Grid $grid, $perPageSelector = true)
+    public function __construct(Grid $grid)
     {
         $this->grid = $grid;
-        $this->perPageSelector = $perPageSelector;
 
         $this->initPaginator();
     }
@@ -40,7 +35,7 @@ class Paginator extends AbstractTool
         $this->paginator = $this->grid->model()->eloquent();
 
         if ($this->paginator instanceof LengthAwarePaginator) {
-            $this->paginator->appends(request()->all());
+            $this->paginator->appends(Input::all());
         }
     }
 
@@ -61,10 +56,6 @@ class Paginator extends AbstractTool
      */
     protected function perPageSelector()
     {
-        if (!$this->perPageSelector) {
-            return;
-        }
-
         return new PerPageSelector($this->grid);
     }
 
@@ -95,7 +86,7 @@ class Paginator extends AbstractTool
      */
     public function render()
     {
-        if (!$this->grid->showPagination()) {
+        if (!$this->grid->usePagination()) {
             return '';
         }
 

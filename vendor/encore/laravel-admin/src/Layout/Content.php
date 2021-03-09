@@ -3,18 +3,16 @@
 namespace Encore\Admin\Layout;
 
 use Closure;
-use Encore\Admin\Facades\Admin;
 use Illuminate\Contracts\Support\Renderable;
-use Illuminate\Support\Arr;
 
 class Content implements Renderable
 {
     /**
-     * Content title.
+     * Content header.
      *
      * @var string
      */
-    protected $title = ' ';
+    protected $header = ' ';
 
     /**
      * Content description.
@@ -36,11 +34,6 @@ class Content implements Renderable
     protected $rows = [];
 
     /**
-     * @var array
-     */
-    protected $view;
-
-    /**
      * Content constructor.
      *
      * @param Closure|null $callback
@@ -53,7 +46,7 @@ class Content implements Renderable
     }
 
     /**
-     * Alias of method `title`.
+     * Set header of content.
      *
      * @param string $header
      *
@@ -61,17 +54,7 @@ class Content implements Renderable
      */
     public function header($header = '')
     {
-        return $this->title($header);
-    }
-
-    /**
-     * @param string $title
-     *
-     * @return $this
-     */
-    public function title($title)
-    {
-        $this->title = $title;
+        $this->header = $header;
 
         return $this;
     }
@@ -118,7 +101,7 @@ class Content implements Renderable
     protected function validateBreadcrumb(array $breadcrumb)
     {
         foreach ($breadcrumb as $item) {
-            if (!is_array($item) || !Arr::has($item, 'text')) {
+            if (!is_array($item) || !array_has($item, 'text')) {
                 throw new  \Exception('Breadcrumb format error!');
             }
         }
@@ -131,7 +114,7 @@ class Content implements Renderable
      *
      * @param mixed $content
      *
-     * @return $this
+     * @return Content
      */
     public function body($content)
     {
@@ -156,40 +139,6 @@ class Content implements Renderable
         }
 
         return $this;
-    }
-
-    /**
-     * Render giving view as content body.
-     *
-     * @param string $view
-     * @param array  $data
-     *
-     * @return $this
-     */
-    public function view($view, $data = [])
-    {
-        $this->view = compact('view', 'data');
-
-        return $this;
-    }
-
-    /**
-     * @param string $view
-     * @param array  $data
-     */
-    public function component($view, $data = [])
-    {
-        return $this->body(Admin::component($view, $data));
-    }
-
-    /**
-     * @param $var
-     *
-     * @return $this
-     */
-    public function dump($var)
-    {
-        return $this->row(admin_dump(...func_get_args()));
     }
 
     /**
@@ -283,18 +232,6 @@ class Content implements Renderable
     }
 
     /**
-     * @return array
-     */
-    protected function getUserData()
-    {
-        if (!$user = Admin::user()) {
-            return [];
-        }
-
-        return Arr::only($user->toArray(), ['id', 'username', 'email', 'name', 'avatar']);
-    }
-
-    /**
      * Render this content.
      *
      * @return string
@@ -302,12 +239,10 @@ class Content implements Renderable
     public function render()
     {
         $items = [
-            'header'      => $this->title,
+            'header'      => $this->header,
             'description' => $this->description,
             'breadcrumb'  => $this->breadcrumb,
-            '_content_'   => $this->build(),
-            '_view_'      => $this->view,
-            '_user_'      => $this->getUserData(),
+            'content'     => $this->build(),
         ];
 
         return view('admin::content', $items)->render();

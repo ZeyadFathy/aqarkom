@@ -10,7 +10,7 @@
     </div>
 
     <!-- /.box-header -->
-    <div class="box-body dependencies">
+    <div class="box-body">
         <div class="table-responsive">
             <table class="table table-striped">
                 @foreach($dependencies as $dependency => $version)
@@ -25,7 +25,3 @@
     </div>
     <!-- /.box-body -->
 </div>
-
-<script>
-    $('.dependencies').slimscroll({height:'510px',size:'3px'});
-</script>

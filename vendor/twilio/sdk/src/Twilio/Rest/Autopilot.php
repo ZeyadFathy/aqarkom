@@ -16,7 +16,6 @@ use Twilio\Rest\Autopilot\V1;
 /**
  * @property \Twilio\Rest\Autopilot\V1 $v1
  * @property \Twilio\Rest\Autopilot\V1\AssistantList $assistants
- * @property \Twilio\Rest\Autopilot\V1\RestoreAssistantList $restoreAssistant
  * @method \Twilio\Rest\Autopilot\V1\AssistantContext assistants(string $sid)
  */
 class Autopilot extends Domain {
@@ -85,10 +84,6 @@ class Autopilot extends Domain {
      */
     protected function contextAssistants(string $sid): \Twilio\Rest\Autopilot\V1\AssistantContext {
         return $this->v1->assistants($sid);
-    }
-
-    protected function getRestoreAssistant(): \Twilio\Rest\Autopilot\V1\RestoreAssistantList {
-        return $this->v1->restoreAssistant;
     }
 
     /**

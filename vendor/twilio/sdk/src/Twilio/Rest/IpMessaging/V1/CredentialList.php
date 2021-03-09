@@ -113,7 +113,8 @@ class CredentialList extends ListResource {
     /**
      * Create the CredentialInstance
      *
-     * @param string $type The type
+     * @param string $type The type of push-notification service the credential is
+     *                     for
      * @param array|Options $options Optional Arguments
      * @return CredentialInstance Created CredentialInstance
      * @throws TwilioException When an HTTP error occurs.
@@ -139,7 +140,7 @@ class CredentialList extends ListResource {
     /**
      * Constructs a CredentialContext
      *
-     * @param string $sid The sid
+     * @param string $sid The unique string that identifies the resource
      */
     public function getContext(string $sid): CredentialContext {
         return new CredentialContext($this->version, $sid);

@@ -12,9 +12,12 @@ namespace Twilio\Rest\Studio\V2;
 use Twilio\Options;
 use Twilio\Values;
 
+/**
+ * PLEASE NOTE that this class contains beta products that are subject to change. Use them with caution.
+ */
 abstract class FlowValidateOptions {
     /**
-     * @param string $commitMessage Description of change made in the revision
+     * @param string $commitMessage The commit_message
      * @return UpdateFlowValidateOptions Options builder
      */
     public static function update(string $commitMessage = Values::NONE): UpdateFlowValidateOptions {
@@ -24,16 +27,16 @@ abstract class FlowValidateOptions {
 
 class UpdateFlowValidateOptions extends Options {
     /**
-     * @param string $commitMessage Description of change made in the revision
+     * @param string $commitMessage The commit_message
      */
     public function __construct(string $commitMessage = Values::NONE) {
         $this->options['commitMessage'] = $commitMessage;
     }
 
     /**
-     * Description of change made in the revision.
+     * The commit_message
      *
-     * @param string $commitMessage Description of change made in the revision
+     * @param string $commitMessage The commit_message
      * @return $this Fluent Builder
      */
     public function setCommitMessage(string $commitMessage): self {

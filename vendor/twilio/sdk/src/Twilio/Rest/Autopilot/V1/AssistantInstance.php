@@ -15,6 +15,7 @@ use Twilio\InstanceResource;
 use Twilio\Options;
 use Twilio\Rest\Autopilot\V1\Assistant\DefaultsList;
 use Twilio\Rest\Autopilot\V1\Assistant\DialogueList;
+use Twilio\Rest\Autopilot\V1\Assistant\ExportAssistantList;
 use Twilio\Rest\Autopilot\V1\Assistant\FieldTypeList;
 use Twilio\Rest\Autopilot\V1\Assistant\ModelBuildList;
 use Twilio\Rest\Autopilot\V1\Assistant\QueryList;
@@ -51,6 +52,7 @@ class AssistantInstance extends InstanceResource {
     protected $_defaults;
     protected $_dialogues;
     protected $_webhooks;
+    protected $_exportAssistant;
 
     /**
      * Initialize the AssistantInstance
@@ -182,6 +184,13 @@ class AssistantInstance extends InstanceResource {
      */
     protected function getWebhooks(): WebhookList {
         return $this->proxy()->webhooks;
+    }
+
+    /**
+     * Access the exportAssistant
+     */
+    protected function getExportAssistant(): ExportAssistantList {
+        return $this->proxy()->exportAssistant;
     }
 
     /**

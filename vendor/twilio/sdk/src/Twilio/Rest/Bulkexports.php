@@ -82,8 +82,7 @@ class Bulkexports extends Domain {
     }
 
     /**
-     * @param string $resourceType The type of communication – Messages, Calls,
-     *                             Conferences, and Participants
+     * @param string $resourceType The type of communication – Messages, Calls
      */
     protected function contextExports(string $resourceType): \Twilio\Rest\Bulkexports\V1\ExportContext {
         return $this->v1->exports($resourceType);
@@ -94,8 +93,7 @@ class Bulkexports extends Domain {
     }
 
     /**
-     * @param string $resourceType The type of communication – Messages, Calls,
-     *                             Conferences, and Participants
+     * @param string $resourceType The type of communication – Messages, Calls
      */
     protected function contextExportConfiguration(string $resourceType): \Twilio\Rest\Bulkexports\V1\ExportConfigurationContext {
         return $this->v1->exportConfiguration($resourceType);

@@ -39,8 +39,6 @@ use Twilio\Version;
  * @property array $links
  * @property string $alexaSkillId
  * @property string $defaultAlexaNotificationProtocolVersion
- * @property string $deliveryCallbackUrl
- * @property bool $deliveryCallbackEnabled
  */
 class ServiceInstance extends InstanceResource {
     protected $_bindings;
@@ -76,8 +74,6 @@ class ServiceInstance extends InstanceResource {
             'links' => Values::array_get($payload, 'links'),
             'alexaSkillId' => Values::array_get($payload, 'alexa_skill_id'),
             'defaultAlexaNotificationProtocolVersion' => Values::array_get($payload, 'default_alexa_notification_protocol_version'),
-            'deliveryCallbackUrl' => Values::array_get($payload, 'delivery_callback_url'),
-            'deliveryCallbackEnabled' => Values::array_get($payload, 'delivery_callback_enabled'),
         ];
 
         $this->solution = ['sid' => $sid ?: $this->properties['sid'], ];

@@ -11,7 +11,7 @@ use Twilio\Values;
  * $isFromTwilio = $validator->validate($_SERVER['HTTP_X_TWILIO_SIGNATURE'], 'https://your-example-url.com/api/route/', $_REQUEST);
  * $isFromTwilio // <- if this is true, the request did come from Twilio, if not, it didn't
  */
-class RequestValidator {
+final class RequestValidator {
 
     /**
      * @access private
@@ -140,7 +140,7 @@ class RequestValidator {
      */
     private static function removePort(array $parsedUrl): string {
         unset($parsedUrl['port']);
-        return self::unparse_url($parsedUrl);
+        return self::buildUrl($parsedUrl);
     }
 
     /**
@@ -154,7 +154,7 @@ class RequestValidator {
             $port = ($parsedUrl['scheme'] === 'https') ? 443 : 80;
             $parsedUrl['port'] = $port;
         }
-        return self::unparse_url($parsedUrl);
+        return self::buildUrl($parsedUrl);
     }
 
     /**
@@ -163,7 +163,7 @@ class RequestValidator {
      * @param array $parsedUrl
      * @return string Full URL
      */
-    static function unparse_url(array $parsedUrl): string {
+    private static function buildUrl(array $parsedUrl): string {
         $parts = [];
 
         $parts['scheme'] = isset($parsedUrl['scheme']) ? $parsedUrl['scheme'] . '://' : '';
@@ -179,4 +179,3 @@ class RequestValidator {
         return \implode('', $parts);
     }
 }
-

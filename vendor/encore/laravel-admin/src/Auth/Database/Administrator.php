@@ -2,7 +2,7 @@
 
 namespace Encore\Admin\Auth\Database;
 
-use Encore\Admin\Traits\DefaultDatetimeFormat;
+use Encore\Admin\Traits\AdminBuilder;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
@@ -16,9 +16,7 @@ use Illuminate\Support\Facades\Storage;
  */
 class Administrator extends Model implements AuthenticatableContract
 {
-    use Authenticatable;
-    use HasPermissions;
-    use DefaultDatetimeFormat;
+    use Authenticatable, AdminBuilder, HasPermissions;
 
     protected $fillable = ['username', 'password', 'name', 'avatar'];
 
@@ -47,19 +45,13 @@ class Administrator extends Model implements AuthenticatableContract
      */
     public function getAvatarAttribute($avatar)
     {
-        if (url()->isValidUrl($avatar)) {
-            return $avatar;
-        }
-
         $disk = config('admin.upload.disk');
 
         if ($avatar && array_key_exists($disk, config('filesystems.disks'))) {
             return Storage::disk(config('admin.upload.disk'))->url($avatar);
         }
 
-        $default = config('admin.default_avatar') ?: '/vendor/laravel-admin/AdminLTE/dist/img/user2-160x160.jpg';
-
-        return admin_asset($default);
+        return admin_asset('/vendor/laravel-admin/AdminLTE/dist/img/user2-160x160.jpg');
     }
 
     /**
@@ -67,7 +59,7 @@ class Administrator extends Model implements AuthenticatableContract
      *
      * @return BelongsToMany
      */
-    public function roles(): BelongsToMany
+    public function roles() : BelongsToMany
     {
         $pivotTable = config('admin.database.role_users_table');
 
@@ -81,7 +73,7 @@ class Administrator extends Model implements AuthenticatableContract
      *
      * @return BelongsToMany
      */
-    public function permissions(): BelongsToMany
+    public function permissions() : BelongsToMany
     {
         $pivotTable = config('admin.database.user_permissions_table');
 

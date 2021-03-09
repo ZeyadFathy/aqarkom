@@ -25,11 +25,11 @@ class FileFormField extends FormField
      *
      * @throws \InvalidArgumentException When error code doesn't exist
      */
-    public function setErrorCode(int $error)
+    public function setErrorCode($error)
     {
-        $codes = [\UPLOAD_ERR_INI_SIZE, \UPLOAD_ERR_FORM_SIZE, \UPLOAD_ERR_PARTIAL, \UPLOAD_ERR_NO_FILE, \UPLOAD_ERR_NO_TMP_DIR, \UPLOAD_ERR_CANT_WRITE, \UPLOAD_ERR_EXTENSION];
+        $codes = [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE, UPLOAD_ERR_PARTIAL, UPLOAD_ERR_NO_FILE, UPLOAD_ERR_NO_TMP_DIR, UPLOAD_ERR_CANT_WRITE, UPLOAD_ERR_EXTENSION];
         if (!\in_array($error, $codes)) {
-            throw new \InvalidArgumentException(sprintf('The error code "%s" is not valid.', $error));
+            throw new \InvalidArgumentException(sprintf('The error code %s is not valid.', $error));
         }
 
         $this->value = ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => $error, 'size' => 0];
@@ -37,26 +37,30 @@ class FileFormField extends FormField
 
     /**
      * Sets the value of the field.
+     *
+     * @param string $value The value of the field
      */
-    public function upload(?string $value)
+    public function upload($value)
     {
         $this->setValue($value);
     }
 
     /**
      * Sets the value of the field.
+     *
+     * @param string $value The value of the field
      */
-    public function setValue(?string $value)
+    public function setValue($value)
     {
         if (null !== $value && is_readable($value)) {
-            $error = \UPLOAD_ERR_OK;
+            $error = UPLOAD_ERR_OK;
             $size = filesize($value);
             $info = pathinfo($value);
             $name = $info['basename'];
 
             // copy to a tmp location
             $tmp = sys_get_temp_dir().'/'.strtr(substr(base64_encode(hash('sha256', uniqid(mt_rand(), true), true)), 0, 7), '/', '_');
-            if (\array_key_exists('extension', $info)) {
+            if (array_key_exists('extension', $info)) {
                 $tmp .= '.'.$info['extension'];
             }
             if (is_file($tmp)) {
@@ -65,7 +69,7 @@ class FileFormField extends FormField
             copy($value, $tmp);
             $value = $tmp;
         } else {
-            $error = \UPLOAD_ERR_NO_FILE;
+            $error = UPLOAD_ERR_NO_FILE;
             $size = 0;
             $name = '';
             $value = '';
@@ -76,8 +80,10 @@ class FileFormField extends FormField
 
     /**
      * Sets path to the file as string for simulating HTTP request.
+     *
+     * @param string $path The path to the file
      */
-    public function setFilePath(string $path)
+    public function setFilePath($path)
     {
         parent::setValue($path);
     }
@@ -94,7 +100,7 @@ class FileFormField extends FormField
         }
 
         if ('file' !== strtolower($this->node->getAttribute('type'))) {
-            throw new \LogicException(sprintf('A FileFormField can only be created from an input tag with a type of file (given type is "%s").', $this->node->getAttribute('type')));
+            throw new \LogicException(sprintf('A FileFormField can only be created from an input tag with a type of file (given type is %s).', $this->node->getAttribute('type')));
         }
 
         $this->setValue(null);

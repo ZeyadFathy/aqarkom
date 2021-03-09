@@ -16,7 +16,7 @@ use Twilio\Values;
 use Twilio\Version;
 
 /**
- * PLEASE NOTE that this class contains beta products that are subject to change. Use them with caution.
+ * PLEASE NOTE that this class contains preview products that are subject to change. Use them with caution. If you currently do not have developer preview access, please contact help@twilio.com.
  */
 class FleetContext extends InstanceContext {
     /**
@@ -56,12 +56,7 @@ class FleetContext extends InstanceContext {
     public function update(array $options = []): FleetInstance {
         $options = new Values($options);
 
-        $data = Values::of([
-            'UniqueName' => $options['uniqueName'],
-            'NetworkAccessProfile' => $options['networkAccessProfile'],
-            'CommandsUrl' => $options['commandsUrl'],
-            'CommandsMethod' => $options['commandsMethod'],
-        ]);
+        $data = Values::of(['UniqueName' => $options['uniqueName'], ]);
 
         $payload = $this->version->update('POST', $this->uri, [], $data);
 

@@ -33,7 +33,6 @@ use Twilio\Version;
  * @property string $runtimeDomain
  * @property string $messagingServiceInstanceSid
  * @property string $chatServiceInstanceSid
- * @property string $flexServiceInstanceSid
  * @property string $uiLanguage
  * @property array $uiAttributes
  * @property array $uiDependencies
@@ -52,9 +51,8 @@ use Twilio\Version;
  * @property array[] $integrations
  * @property array $outboundCallFlows
  * @property string[] $serverlessServiceSids
+ * @property array[] $wfmIntegrations
  * @property array $queueStatsConfiguration
- * @property array $notifications
- * @property array $markdown
  * @property string $url
  */
 class ConfigurationInstance extends InstanceResource {
@@ -85,7 +83,6 @@ class ConfigurationInstance extends InstanceResource {
             'runtimeDomain' => Values::array_get($payload, 'runtime_domain'),
             'messagingServiceInstanceSid' => Values::array_get($payload, 'messaging_service_instance_sid'),
             'chatServiceInstanceSid' => Values::array_get($payload, 'chat_service_instance_sid'),
-            'flexServiceInstanceSid' => Values::array_get($payload, 'flex_service_instance_sid'),
             'uiLanguage' => Values::array_get($payload, 'ui_language'),
             'uiAttributes' => Values::array_get($payload, 'ui_attributes'),
             'uiDependencies' => Values::array_get($payload, 'ui_dependencies'),
@@ -104,9 +101,8 @@ class ConfigurationInstance extends InstanceResource {
             'integrations' => Values::array_get($payload, 'integrations'),
             'outboundCallFlows' => Values::array_get($payload, 'outbound_call_flows'),
             'serverlessServiceSids' => Values::array_get($payload, 'serverless_service_sids'),
+            'wfmIntegrations' => Values::array_get($payload, 'wfm_integrations'),
             'queueStatsConfiguration' => Values::array_get($payload, 'queue_stats_configuration'),
-            'notifications' => Values::array_get($payload, 'notifications'),
-            'markdown' => Values::array_get($payload, 'markdown'),
             'url' => Values::array_get($payload, 'url'),
         ];
 

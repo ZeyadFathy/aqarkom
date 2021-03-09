@@ -41,10 +41,11 @@ use Twilio\Rest\Preview\Wireless as PreviewWireless;
  * @property \Twilio\Rest\Preview\Wireless\CommandList $commands
  * @property \Twilio\Rest\Preview\Wireless\RatePlanList $ratePlans
  * @property \Twilio\Rest\Preview\Wireless\SimList $sims
- * @property \Twilio\Rest\Preview\TrustedComms\BrandedChannelList $brandedChannels
- * @property \Twilio\Rest\Preview\TrustedComms\BrandsInformationList $brandsInformation
+ * @property \Twilio\Rest\Preview\TrustedComms\BrandedCallList $brandedCalls
+ * @property \Twilio\Rest\Preview\TrustedComms\BusinessList $businesses
  * @property \Twilio\Rest\Preview\TrustedComms\CpsList $cps
  * @property \Twilio\Rest\Preview\TrustedComms\CurrentCallList $currentCalls
+ * @property \Twilio\Rest\Preview\TrustedComms\PhoneCallList $phoneCalls
  * @method \Twilio\Rest\Preview\BulkExports\ExportContext exports(string $resourceType)
  * @method \Twilio\Rest\Preview\BulkExports\ExportConfigurationContext exportConfiguration(string $resourceType)
  * @method \Twilio\Rest\Preview\DeployedDevices\FleetContext fleets(string $sid)
@@ -57,8 +58,7 @@ use Twilio\Rest\Preview\Wireless as PreviewWireless;
  * @method \Twilio\Rest\Preview\Wireless\CommandContext commands(string $sid)
  * @method \Twilio\Rest\Preview\Wireless\RatePlanContext ratePlans(string $sid)
  * @method \Twilio\Rest\Preview\Wireless\SimContext sims(string $sid)
- * @method \Twilio\Rest\Preview\TrustedComms\BrandedChannelContext brandedChannels(string $sid)
- * @method \Twilio\Rest\Preview\TrustedComms\BrandsInformationContext brandsInformation()
+ * @method \Twilio\Rest\Preview\TrustedComms\BusinessContext businesses(string $sid)
  * @method \Twilio\Rest\Preview\TrustedComms\CpsContext cps()
  * @method \Twilio\Rest\Preview\TrustedComms\CurrentCallContext currentCalls()
  */
@@ -201,8 +201,7 @@ class Preview extends Domain {
     }
 
     /**
-     * @param string $resourceType The type of communication – Messages, Calls,
-     *                             Conferences, and Participants
+     * @param string $resourceType The type of communication – Messages, Calls
      */
     protected function contextExports(string $resourceType): \Twilio\Rest\Preview\BulkExports\ExportContext {
         return $this->bulkExports->exports($resourceType);
@@ -213,8 +212,7 @@ class Preview extends Domain {
     }
 
     /**
-     * @param string $resourceType The type of communication – Messages, Calls,
-     *                             Conferences, and Participants
+     * @param string $resourceType The type of communication – Messages, Calls
      */
     protected function contextExportConfiguration(string $resourceType): \Twilio\Rest\Preview\BulkExports\ExportConfigurationContext {
         return $this->bulkExports->exportConfiguration($resourceType);
@@ -331,23 +329,19 @@ class Preview extends Domain {
         return $this->wireless->sims($sid);
     }
 
-    protected function getBrandedChannels(): \Twilio\Rest\Preview\TrustedComms\BrandedChannelList {
-        return $this->trustedComms->brandedChannels;
+    protected function getBrandedCalls(): \Twilio\Rest\Preview\TrustedComms\BrandedCallList {
+        return $this->trustedComms->brandedCalls;
+    }
+
+    protected function getBusinesses(): \Twilio\Rest\Preview\TrustedComms\BusinessList {
+        return $this->trustedComms->businesses;
     }
 
     /**
-     * @param string $sid Branded Channel Sid.
+     * @param string $sid A string that uniquely identifies this Business.
      */
-    protected function contextBrandedChannels(string $sid): \Twilio\Rest\Preview\TrustedComms\BrandedChannelContext {
-        return $this->trustedComms->brandedChannels($sid);
-    }
-
-    protected function getBrandsInformation(): \Twilio\Rest\Preview\TrustedComms\BrandsInformationList {
-        return $this->trustedComms->brandsInformation;
-    }
-
-    protected function contextBrandsInformation(): \Twilio\Rest\Preview\TrustedComms\BrandsInformationContext {
-        return $this->trustedComms->brandsInformation();
+    protected function contextBusinesses(string $sid): \Twilio\Rest\Preview\TrustedComms\BusinessContext {
+        return $this->trustedComms->businesses($sid);
     }
 
     protected function getCps(): \Twilio\Rest\Preview\TrustedComms\CpsList {
@@ -364,6 +358,10 @@ class Preview extends Domain {
 
     protected function contextCurrentCalls(): \Twilio\Rest\Preview\TrustedComms\CurrentCallContext {
         return $this->trustedComms->currentCalls();
+    }
+
+    protected function getPhoneCalls(): \Twilio\Rest\Preview\TrustedComms\PhoneCallList {
+        return $this->trustedComms->phoneCalls;
     }
 
     /**

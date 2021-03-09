@@ -44,7 +44,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @throws \LogicException if the node is not a button inside a form tag
      */
-    public function __construct(\DOMElement $node, string $currentUri = null, string $method = null, string $baseHref = null)
+    public function __construct(\DOMElement $node, string $currentUri, string $method = null, string $baseHref = null)
     {
         parent::__construct($node, $currentUri, $method);
         $this->baseHref = $baseHref;
@@ -203,7 +203,7 @@ class Form extends Link implements \ArrayAccess
         $uri = parent::getUri();
 
         if (!\in_array($this->getMethod(), ['POST', 'PUT', 'DELETE', 'PATCH'])) {
-            $query = parse_url($uri, \PHP_URL_QUERY);
+            $query = parse_url($uri, PHP_URL_QUERY);
             $currentParameters = [];
             if ($query) {
                 parse_str($query, $currentParameters);
@@ -251,29 +251,23 @@ class Form extends Link implements \ArrayAccess
     }
 
     /**
-     * Gets the form name.
-     *
-     * If no name is defined on the form, an empty string is returned.
-     */
-    public function getName(): string
-    {
-        return $this->node->getAttribute('name');
-    }
-
-    /**
      * Returns true if the named field exists.
+     *
+     * @param string $name The field name
      *
      * @return bool true if the field exists, false otherwise
      */
-    public function has(string $name)
+    public function has($name)
     {
         return $this->fields->has($name);
     }
 
     /**
      * Removes a field from the form.
+     *
+     * @param string $name The field name
      */
-    public function remove(string $name)
+    public function remove($name)
     {
         $this->fields->remove($name);
     }
@@ -281,11 +275,13 @@ class Form extends Link implements \ArrayAccess
     /**
      * Gets a named field.
      *
-     * @return FormField|FormField[]|FormField[][] The value of the field
+     * @param string $name The field name
+     *
+     * @return FormField The field instance
      *
      * @throws \InvalidArgumentException When field is not present in this form
      */
-    public function get(string $name)
+    public function get($name)
     {
         return $this->fields->get($name);
     }
@@ -325,7 +321,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @param string $name The field name
      *
-     * @return FormField|FormField[]|FormField[][] The value of the field
+     * @return FormField The associated Field instance
      *
      * @throws \InvalidArgumentException if the field does not exist
      */

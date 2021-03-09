@@ -38,16 +38,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Laravel-admin bootstrap setting
-    |--------------------------------------------------------------------------
-    |
-    | This value is the path of laravel-admin bootstrap file.
-    |
-    */
-    'bootstrap' => app_path('Admin/bootstrap.php'),
-
-    /*
-    |--------------------------------------------------------------------------
     | Laravel-admin route settings
     |--------------------------------------------------------------------------
     |
@@ -58,7 +48,7 @@ return [
     */
     'route' => [
 
-        'prefix' => env('ADMIN_ROUTE_PREFIX', 'admin'),
+        'prefix' => 'admin',
 
         'namespace' => 'App\\Admin\\Controllers',
 
@@ -112,8 +102,6 @@ return [
 
         'controller' => App\Admin\Controllers\AuthController::class,
 
-        'guard' => 'admin',
-
         'guards' => [
             'admin' => [
                 'driver'   => 'session',
@@ -126,18 +114,6 @@ return [
                 'driver' => 'eloquent',
                 'model'  => Encore\Admin\Auth\Database\Administrator::class,
             ],
-        ],
-
-        // Add "remember me" to login form
-        'remember' => true,
-
-        // Redirect to the specified URI when user is not authorized.
-        'redirect_to' => 'auth/login',
-
-        // The URIs that should be excluded from authorization.
-        'excepts' => [
-            'auth/login',
-            'auth/logout',
         ],
     ],
 
@@ -229,30 +205,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Indicates whether to check route permission.
-    |--------------------------------------------------------------------------
-    */
-    'check_route_permission' => true,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Indicates whether to check menu roles.
-    |--------------------------------------------------------------------------
-    */
-    'check_menu_roles'       => true,
-
-    /*
-    |--------------------------------------------------------------------------
-    | User default avatar
-    |--------------------------------------------------------------------------
-    |
-    | Set a default avatar for newly created users.
-    |
-    */
-    'default_avatar' => '/vendor/laravel-admin/AdminLTE/dist/img/user2-160x160.jpg',
-
-    /*
-    |--------------------------------------------------------------------------
     | Admin map field provider
     |--------------------------------------------------------------------------
     |
@@ -306,7 +258,7 @@ return [
     | Show version at footer
     |--------------------------------------------------------------------------
     |
-    | Whether to display the version number of laravel-admin at the footer of
+    | Whether to display the version number of laravel-admim at the footer of
     | each page
     |
     */
@@ -339,41 +291,6 @@ return [
     | Whether enable default breadcrumb for every page content.
     */
     'enable_default_breadcrumb' => true,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Enable/Disable assets minify
-    |--------------------------------------------------------------------------
-    */
-    'minify_assets' => [
-
-        // Assets will not be minified.
-        'excepts' => [
-
-        ],
-
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Enable/Disable sidebar menu search
-    |--------------------------------------------------------------------------
-    */
-    'enable_menu_search' => true,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Alert message that will displayed on top of the page.
-    |--------------------------------------------------------------------------
-    */
-    'top_alert' => '',
-
-    /*
-    |--------------------------------------------------------------------------
-    | The global Grid action display class.
-    |--------------------------------------------------------------------------
-    */
-    'grid_action_class' => \Encore\Admin\Grid\Displayers\DropdownActions::class,
 
     /*
     |--------------------------------------------------------------------------

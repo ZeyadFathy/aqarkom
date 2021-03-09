@@ -135,8 +135,6 @@ class DomainList extends ListResource {
             'SipRegistration' => Serialize::booleanToString($options['sipRegistration']),
             'EmergencyCallingEnabled' => Serialize::booleanToString($options['emergencyCallingEnabled']),
             'Secure' => Serialize::booleanToString($options['secure']),
-            'ByocTrunkSid' => $options['byocTrunkSid'],
-            'EmergencyCallerSid' => $options['emergencyCallerSid'],
         ]);
 
         $payload = $this->version->create('POST', $this->uri, [], $data);

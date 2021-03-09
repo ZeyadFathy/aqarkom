@@ -109,8 +109,7 @@ abstract class Version {
             $timeout
         );
 
-        // 3XX response codes are allowed here to allow for 307 redirect from Deactivations API.
-        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 400) {
+        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
             throw $this->exception($response, 'Unable to fetch record');
         }
 
@@ -168,8 +167,13 @@ abstract class Version {
     }
 
     public function readLimits(int $limit = null, int $pageSize = null): array {
-        if ($limit && $pageSize === null) {
-            $pageSize = $limit;
+        $pageLimit = Values::NONE;
+
+        if ($limit) {
+            if ($pageSize === null) {
+                $pageSize = \min($limit, self::MAX_PAGE_SIZE);
+            }
+            $pageLimit = (int)(\ceil($limit / (float)$pageSize));
         }
 
         $pageSize = \min($pageSize, self::MAX_PAGE_SIZE);
@@ -177,7 +181,7 @@ abstract class Version {
         return [
             'limit' => $limit ?: Values::NONE,
             'pageSize' => $pageSize ?: Values::NONE,
-            'pageLimit' => Values::NONE,
+            'pageLimit' => $pageLimit,
         ];
     }
 

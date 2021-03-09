@@ -16,6 +16,9 @@ use Twilio\Serialize;
 use Twilio\Values;
 use Twilio\Version;
 
+/**
+ * PLEASE NOTE that this class contains beta products that are subject to change. Use them with caution.
+ */
 class FlowValidateList extends ListResource {
     /**
      * Construct the FlowValidateList
@@ -34,9 +37,9 @@ class FlowValidateList extends ListResource {
     /**
      * Update the FlowValidateInstance
      *
-     * @param string $friendlyName The string that you assigned to describe the Flow
-     * @param string $status The status of the Flow
-     * @param array $definition JSON representation of flow definition
+     * @param string $friendlyName The friendly_name
+     * @param string $status The status
+     * @param array $definition The definition
      * @param array|Options $options Optional Arguments
      * @return FlowValidateInstance Updated FlowValidateInstance
      * @throws TwilioException When an HTTP error occurs.

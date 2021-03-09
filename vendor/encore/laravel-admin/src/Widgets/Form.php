@@ -2,17 +2,9 @@
 
 namespace Encore\Admin\Widgets;
 
-use Closure;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Form as BaseForm;
 use Encore\Admin\Form\Field;
-use Encore\Admin\Layout\Content;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Renderable;
-use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Illuminate\Support\MessageBag;
-use Illuminate\Validation\Validator;
 
 /**
  * Class Form.
@@ -20,11 +12,7 @@ use Illuminate\Validation\Validator;
  * @method Field\Text           text($name, $label = '')
  * @method Field\Password       password($name, $label = '')
  * @method Field\Checkbox       checkbox($name, $label = '')
- * @method Field\CheckboxButton checkboxButton($name, $label = '')
- * @method Field\CheckboxCard   checkboxCard($name, $label = '')
  * @method Field\Radio          radio($name, $label = '')
- * @method Field\RadioButton    radioButton($name, $label = '')
- * @method Field\RadioCard      radioCard($name, $label = '')
  * @method Field\Select         select($name, $label = '')
  * @method Field\MultipleSelect multipleSelect($name, $label = '')
  * @method Field\Textarea       textarea($name, $label = '')
@@ -36,52 +24,30 @@ use Illuminate\Validation\Validator;
  * @method Field\Email          email($name, $label = '')
  * @method Field\Mobile         mobile($name, $label = '')
  * @method Field\Slider         slider($name, $label = '')
+ * @method Field\Map            map($latitude, $longitude, $label = '')
+ * @method Field\Editor         editor($name, $label = '')
  * @method Field\File           file($name, $label = '')
  * @method Field\Image          image($name, $label = '')
  * @method Field\Date           date($name, $label = '')
  * @method Field\Datetime       datetime($name, $label = '')
  * @method Field\Time           time($name, $label = '')
- * @method Field\Year           year($column, $label = '')
- * @method Field\Month          month($column, $label = '')
  * @method Field\DateRange      dateRange($start, $end, $label = '')
  * @method Field\DateTimeRange  dateTimeRange($start, $end, $label = '')
  * @method Field\TimeRange      timeRange($start, $end, $label = '')
  * @method Field\Number         number($name, $label = '')
  * @method Field\Currency       currency($name, $label = '')
+ * @method Field\Json           json($name, $label = '')
  * @method Field\SwitchField    switch($name, $label = '')
  * @method Field\Display        display($name, $label = '')
  * @method Field\Rate           rate($name, $label = '')
- * @method Field\Divider        divider($title = '')
+ * @method Field\Divide         divide()
  * @method Field\Decimal        decimal($column, $label = '')
  * @method Field\Html           html($html)
  * @method Field\Tags           tags($column, $label = '')
  * @method Field\Icon           icon($column, $label = '')
- * @method Field\Captcha        captcha($column, $label = '')
- * @method Field\Listbox        listbox($column, $label = '')
- * @method Field\Table          table($column, $label, $builder)
- * @method Field\Timezone       timezone($column, $label = '')
- * @method Field\KeyValue       keyValue($column, $label = '')
- * @method Field\ListField      list($column, $label = '')
- * @method mixed                handle(Request $request)
  */
 class Form implements Renderable
 {
-    use BaseForm\Concerns\HandleCascadeFields;
-
-    /**
-     * The title of form.
-     *
-     * @var string
-     */
-    public $title;
-
-    /**
-     * The description of form.
-     *
-     * @var string
-     */
-    public $description;
-
     /**
      * @var Field[]
      */
@@ -105,88 +71,11 @@ class Form implements Renderable
     protected $buttons = ['reset', 'submit'];
 
     /**
-     * Width for label and submit field.
-     *
-     * @var array
-     */
-    protected $width = [
-        'label' => 2,
-        'field' => 8,
-    ];
-
-    /**
-     * @var bool
-     */
-    public $inbox = true;
-
-    /**
-     * @var string
-     */
-    public $confirm = '';
-
-    /**
-     * @var Form
-     */
-    protected $form;
-
-    /**
      * Form constructor.
      *
      * @param array $data
      */
     public function __construct($data = [])
-    {
-        $this->fill($data);
-
-        $this->initFormAttributes();
-    }
-
-    /**
-     * Get form title.
-     *
-     * @return mixed
-     */
-    public function title()
-    {
-        return $this->title;
-    }
-
-    /**
-     * Get form description.
-     *
-     * @return mixed
-     */
-    public function description()
-    {
-        return $this->description ?: ' ';
-    }
-
-    /**
-     * @return array
-     */
-    public function data()
-    {
-        return $this->data;
-    }
-
-    /**
-     * @return array
-     */
-    public function confirm($message)
-    {
-        $this->confirm = $message;
-
-        return $this;
-    }
-
-    /**
-     * Fill data to form fields.
-     *
-     * @param array $data
-     *
-     * @return $this
-     */
-    public function fill($data = [])
     {
         if ($data instanceof Arrayable) {
             $data = $data->toArray();
@@ -196,19 +85,7 @@ class Form implements Renderable
             $this->data = $data;
         }
 
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function sanitize()
-    {
-        foreach (['_form_', '_token'] as $key) {
-            request()->request->remove($key);
-        }
-
-        return $this;
+        $this->initFormAttributes();
     }
 
     /**
@@ -217,13 +94,36 @@ class Form implements Renderable
     protected function initFormAttributes()
     {
         $this->attributes = [
-            'id'             => 'widget-form-'.uniqid(),
             'method'         => 'POST',
             'action'         => '',
             'class'          => 'form-horizontal',
             'accept-charset' => 'UTF-8',
             'pjax-container' => true,
         ];
+    }
+
+    /**
+     * Action uri of the form.
+     *
+     * @param string $action
+     *
+     * @return $this
+     */
+    public function action($action)
+    {
+        return $this->attribute('action', $action);
+    }
+
+    /**
+     * Method of the form.
+     *
+     * @param string $method
+     *
+     * @return $this
+     */
+    public function method($method = 'POST')
+    {
+        return $this->attribute('method', strtoupper($method));
     }
 
     /**
@@ -248,66 +148,13 @@ class Form implements Renderable
     }
 
     /**
-     * Format form attributes form array to html.
-     *
-     * @param array $attributes
-     *
-     * @return string
-     */
-    public function formatAttribute($attributes = [])
-    {
-        $attributes = $attributes ?: $this->attributes;
-
-        if ($this->hasFile()) {
-            $attributes['enctype'] = 'multipart/form-data';
-        }
-
-        $html = [];
-        foreach ($attributes as $key => $val) {
-            $html[] = "$key=\"$val\"";
-        }
-
-        return implode(' ', $html) ?: '';
-    }
-
-    /**
-     * Action uri of the form.
-     *
-     * @param string $action
-     *
-     * @return $this
-     */
-    public function action($action)
-    {
-        return $this->attribute('action', $action);
-    }
-
-    /**
-     * Method of the form.
-     *
-     * @param string $method
-     *
-     * @return $this
-     */
-    public function method($method = 'POST')
-    {
-        if (strtolower($method) == 'put') {
-            $this->hidden('_method')->default($method);
-
-            return $this;
-        }
-
-        return $this->attribute('method', strtoupper($method));
-    }
-
-    /**
      * Disable Pjax.
      *
      * @return $this
      */
     public function disablePjax()
     {
-        Arr::forget($this->attributes, 'pjax-container');
+        array_forget($this->attributes, 'pjax-container');
 
         return $this;
     }
@@ -351,25 +198,25 @@ class Form implements Renderable
             $field->setWidth($fieldWidth, $labelWidth);
         });
 
-        // set this width
-        $this->width = [
-            'label' => $labelWidth,
-            'field' => $fieldWidth,
-        ];
-
         return $this;
     }
 
     /**
-     * Determine if the form has field type.
+     * Find field class with given name.
      *
-     * @param string $name
+     * @param string $method
      *
-     * @return bool
+     * @return bool|string
      */
-    public function hasField($name)
+    public static function findFieldClass($method)
     {
-        return isset(BaseForm::$availableFields[$name]);
+        $class = array_get(\Encore\Admin\Form::$availableFields, $method);
+
+        if (class_exists($class)) {
+            return $class;
+        }
+
+        return false;
     }
 
     /**
@@ -379,23 +226,11 @@ class Form implements Renderable
      *
      * @return $this
      */
-    public function pushField(Field $field)
+    public function pushField(Field &$field)
     {
-        $field->setWidgetForm($this);
-
         array_push($this->fields, $field);
 
         return $this;
-    }
-
-    /**
-     * Get all fields of form.
-     *
-     * @return Field[]
-     */
-    public function fields()
-    {
-        return collect($this->fields);
     }
 
     /**
@@ -405,15 +240,39 @@ class Form implements Renderable
      */
     protected function getVariables()
     {
-        $this->fields()->each->fill($this->data());
+        foreach ($this->fields as $field) {
+            $field->fill($this->data);
+        }
 
         return [
             'fields'     => $this->fields,
             'attributes' => $this->formatAttribute(),
             'method'     => $this->attributes['method'],
             'buttons'    => $this->buttons,
-            'width'      => $this->width,
         ];
+    }
+
+    /**
+     * Format form attributes form array to html.
+     *
+     * @param array $attributes
+     *
+     * @return string
+     */
+    public function formatAttribute($attributes = [])
+    {
+        $attributes = $attributes ?: $this->attributes;
+
+        if ($this->hasFile()) {
+            $attributes['enctype'] = 'multipart/form-data';
+        }
+
+        $html = [];
+        foreach ($attributes as $key => $val) {
+            $html[] = "$key=\"$val\"";
+        }
+
+        return implode(' ', $html) ?: '';
     }
 
     /**
@@ -433,157 +292,23 @@ class Form implements Renderable
     }
 
     /**
-     * Validate this form fields.
+     * Generate a Field object and add to form builder if Field exists.
      *
-     * @param Request $request
+     * @param string $method
+     * @param array  $arguments
      *
-     * @return bool|MessageBag
+     * @return Field|null
      */
-    public function validate(Request $request)
+    public function __call($method, $arguments)
     {
-        if (method_exists($this, 'form')) {
-            $this->form();
-        }
+        if ($className = static::findFieldClass($method)) {
+            $name = array_get($arguments, 0, '');
 
-        $failedValidators = [];
+            $element = new $className($name, array_slice($arguments, 1));
 
-        /** @var Field $field */
-        foreach ($this->fields() as $field) {
-            if (!$validator = $field->getValidator($request->all())) {
-                continue;
-            }
+            $this->pushField($element);
 
-            if (($validator instanceof Validator) && !$validator->passes()) {
-                $failedValidators[] = $validator;
-            }
-        }
-
-        $message = $this->mergeValidationMessages($failedValidators);
-
-        return $message->any() ? $message : false;
-    }
-
-    /**
-     * Merge validation messages from input validators.
-     *
-     * @param \Illuminate\Validation\Validator[] $validators
-     *
-     * @return MessageBag
-     */
-    protected function mergeValidationMessages($validators)
-    {
-        $messageBag = new MessageBag();
-
-        foreach ($validators as $validator) {
-            $messageBag = $messageBag->merge($validator->messages());
-        }
-
-        return $messageBag;
-    }
-
-    /**
-     * Add a fieldset to form.
-     *
-     * @param string  $title
-     * @param Closure $setCallback
-     *
-     * @return Field\Fieldset
-     */
-    public function fieldset(string $title, Closure $setCallback)
-    {
-        $fieldset = new Field\Fieldset();
-
-        $this->html($fieldset->start($title))->plain();
-
-        $setCallback($this);
-
-        $this->html($fieldset->end())->plain();
-
-        return $fieldset;
-    }
-
-    /**
-     * @return $this
-     */
-    public function unbox()
-    {
-        $this->inbox = false;
-
-        return $this;
-    }
-
-    protected function addConfirmScript()
-    {
-        $id = $this->attributes['id'];
-
-        $trans = [
-            'cancel' => trans('admin.cancel'),
-            'submit' => trans('admin.submit'),
-        ];
-
-        $settings = [
-            'type'                => 'question',
-            'showCancelButton'    => true,
-            'confirmButtonText'   => $trans['submit'],
-            'cancelButtonText'    => $trans['cancel'],
-            'title'               => $this->confirm,
-            'text'                => '',
-        ];
-
-        $settings = trim(json_encode($settings, JSON_PRETTY_PRINT));
-
-        $script = <<<SCRIPT
-
-$('form#{$id}').off('submit').on('submit', function (e) {
-    e.preventDefault();
-    var form = this;
-    $.admin.swal($settings).then(function (result) {
-        if (result.value == true) {
-            form.submit();
-        }
-    });
-    return false;
-});
-SCRIPT;
-
-        Admin::script($script);
-    }
-
-    protected function addCascadeScript()
-    {
-        $id = $this->attributes['id'];
-
-        $script = <<<SCRIPT
-;(function () {
-    $('form#{$id}').submit(function (e) {
-        e.preventDefault();
-        $(this).find('div.cascade-group.hide :input').attr('disabled', true);
-    });
-})();
-SCRIPT;
-
-        Admin::script($script);
-    }
-
-    protected function prepareForm()
-    {
-        if (method_exists($this, 'form')) {
-            $this->form();
-        }
-
-        if (!empty($this->confirm)) {
-            $this->addConfirmScript();
-        }
-
-        $this->addCascadeScript();
-    }
-
-    protected function prepareHandle()
-    {
-        if (method_exists($this, 'handle')) {
-            $this->method('POST');
-            $this->action(admin_url('_handle_form_'));
-            $this->hidden('_form_')->default(get_called_class());
+            return $element;
         }
     }
 
@@ -594,51 +319,16 @@ SCRIPT;
      */
     public function render()
     {
-        $this->prepareForm();
-
-        $this->prepareHandle();
-
-        $form = view('admin::widgets.form', $this->getVariables())->render();
-
-        if (!($title = $this->title()) || !$this->inbox) {
-            return $form;
-        }
-
-        return (new Box($title, $form))->render();
+        return view('admin::widgets.form', $this->getVariables())->render();
     }
 
     /**
-     * Generate a Field object and add to form builder if Field exists.
+     * Output as string.
      *
-     * @param string $method
-     * @param array  $arguments
-     *
-     * @return Field|$this
+     * @return string
      */
-    public function __call($method, $arguments)
+    public function __toString()
     {
-        if (!$this->hasField($method)) {
-            return $this;
-        }
-
-        $class = BaseForm::$availableFields[$method];
-
-        $field = new $class(Arr::get($arguments, 0), array_slice($arguments, 1));
-
-        return tap($field, function ($field) {
-            $this->pushField($field);
-        });
-    }
-
-    /**
-     * @param Content $content
-     *
-     * @return Content
-     */
-    public function __invoke(Content $content)
-    {
-        return $content->title($this->title())
-            ->description($this->description())
-            ->body($this);
+        return $this->render();
     }
 }

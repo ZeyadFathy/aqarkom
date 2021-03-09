@@ -12,21 +12,14 @@ namespace Twilio\Rest\Messaging;
 use Twilio\Domain;
 use Twilio\Exceptions\TwilioException;
 use Twilio\InstanceContext;
-use Twilio\Rest\Messaging\V1\BrandRegistrationList;
-use Twilio\Rest\Messaging\V1\DeactivationsList;
 use Twilio\Rest\Messaging\V1\ServiceList;
 use Twilio\Version;
 
 /**
- * @property BrandRegistrationList $brandRegistrations
- * @property DeactivationsList $deactivations
  * @property ServiceList $services
- * @method \Twilio\Rest\Messaging\V1\BrandRegistrationContext brandRegistrations(string $sid)
  * @method \Twilio\Rest\Messaging\V1\ServiceContext services(string $sid)
  */
 class V1 extends Version {
-    protected $_brandRegistrations;
-    protected $_deactivations;
     protected $_services;
 
     /**
@@ -37,20 +30,6 @@ class V1 extends Version {
     public function __construct(Domain $domain) {
         parent::__construct($domain);
         $this->version = 'v1';
-    }
-
-    protected function getBrandRegistrations(): BrandRegistrationList {
-        if (!$this->_brandRegistrations) {
-            $this->_brandRegistrations = new BrandRegistrationList($this);
-        }
-        return $this->_brandRegistrations;
-    }
-
-    protected function getDeactivations(): DeactivationsList {
-        if (!$this->_deactivations) {
-            $this->_deactivations = new DeactivationsList($this);
-        }
-        return $this->_deactivations;
     }
 
     protected function getServices(): ServiceList {

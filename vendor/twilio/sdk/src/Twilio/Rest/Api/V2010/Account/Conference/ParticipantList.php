@@ -37,10 +37,9 @@ class ParticipantList extends ListResource {
     /**
      * Create the ParticipantInstance
      *
-     * @param string $from The phone number, Client identifier, or username portion
-     *                     of SIP address that made this call.
-     * @param string $to The phone number, SIP address or Client identifier that
-     *                   received this call.
+     * @param string $from The `from` phone number used to invite a participant
+     * @param string $to The number, client id, or sip address of the new
+     *                   participant
      * @param array|Options $options Optional Arguments
      * @return ParticipantInstance Created ParticipantInstance
      * @throws TwilioException When an HTTP error occurs.
@@ -54,7 +53,6 @@ class ParticipantList extends ListResource {
             'StatusCallback' => $options['statusCallback'],
             'StatusCallbackMethod' => $options['statusCallbackMethod'],
             'StatusCallbackEvent' => Serialize::map($options['statusCallbackEvent'], function($e) { return $e; }),
-            'Label' => $options['label'],
             'Timeout' => $options['timeout'],
             'Record' => Serialize::booleanToString($options['record']),
             'Muted' => Serialize::booleanToString($options['muted']),
@@ -82,11 +80,7 @@ class ParticipantList extends ListResource {
             'ConferenceRecordingStatusCallbackEvent' => Serialize::map($options['conferenceRecordingStatusCallbackEvent'], function($e) { return $e; }),
             'Coaching' => Serialize::booleanToString($options['coaching']),
             'CallSidToCoach' => $options['callSidToCoach'],
-            'JitterBufferSize' => $options['jitterBufferSize'],
             'Byoc' => $options['byoc'],
-            'CallerId' => $options['callerId'],
-            'CallReason' => $options['callReason'],
-            'RecordingTrack' => $options['recordingTrack'],
         ]);
 
         $payload = $this->version->create('POST', $this->uri, [], $data);
@@ -192,8 +186,7 @@ class ParticipantList extends ListResource {
     /**
      * Constructs a ParticipantContext
      *
-     * @param string $callSid The Call SID or URL encoded label of the participant
-     *                        to fetch
+     * @param string $callSid The Call SID of the resource to fetch
      */
     public function getContext(string $callSid): ParticipantContext {
         return new ParticipantContext(

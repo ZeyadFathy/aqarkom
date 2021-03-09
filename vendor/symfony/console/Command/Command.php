@@ -40,8 +40,8 @@ class Command
     private $aliases = [];
     private $definition;
     private $hidden = false;
-    private $help = '';
-    private $description = '';
+    private $help;
+    private $description;
     private $ignoreValidationErrors = false;
     private $applicationDefinitionMerged = false;
     private $applicationDefinitionMergedWithArgs = false;
@@ -55,7 +55,7 @@ class Command
      */
     public static function getDefaultName()
     {
-        $class = static::class;
+        $class = \get_called_class();
         $r = new \ReflectionProperty($class, 'defaultName');
 
         return $class === $r->class ? static::$defaultName : null;
@@ -105,7 +105,7 @@ class Command
     /**
      * Gets the helper set.
      *
-     * @return HelperSet|null A HelperSet instance
+     * @return HelperSet A HelperSet instance
      */
     public function getHelperSet()
     {
@@ -115,7 +115,7 @@ class Command
     /**
      * Gets the application instance for this command.
      *
-     * @return Application|null An Application instance
+     * @return Application An Application instance
      */
     public function getApplication()
     {
@@ -150,7 +150,7 @@ class Command
      * execute() method, you set the code to execute by passing
      * a Closure to the setCode() method.
      *
-     * @return int 0 if everything went fine, or an exit code
+     * @return int|null null or 0 if everything went fine, or an error code
      *
      * @throws LogicException When this abstract method is not implemented
      *
@@ -223,7 +223,7 @@ class Command
         if (null !== $this->processTitle) {
             if (\function_exists('cli_set_process_title')) {
                 if (!@cli_set_process_title($this->processTitle)) {
-                    if ('Darwin' === \PHP_OS) {
+                    if ('Darwin' === PHP_OS) {
                         $output->writeln('<comment>Running "cli_set_process_title" as an unprivileged user is not supported on MacOS.</comment>', OutputInterface::VERBOSITY_VERY_VERBOSE);
                     } else {
                         cli_set_process_title($this->processTitle);
@@ -253,10 +253,6 @@ class Command
             $statusCode = ($this->code)($input, $output);
         } else {
             $statusCode = $this->execute($input, $output);
-
-            if (!\is_int($statusCode)) {
-                @trigger_error(sprintf('Return value of "%s::execute()" should always be of the type int since Symfony 4.4, %s returned.', static::class, \gettype($statusCode)), \E_USER_DEPRECATED);
-            }
         }
 
         return is_numeric($statusCode) ? (int) $statusCode : 0;
@@ -281,14 +277,7 @@ class Command
         if ($code instanceof \Closure) {
             $r = new \ReflectionFunction($code);
             if (null === $r->getClosureThis()) {
-                set_error_handler(static function () {});
-                try {
-                    if ($c = \Closure::bind($code, $this)) {
-                        $code = $c;
-                    }
-                } finally {
-                    restore_error_handler();
-                }
+                $code = \Closure::bind($code, $this);
             }
         }
 
@@ -350,10 +339,6 @@ class Command
      */
     public function getDefinition()
     {
-        if (null === $this->definition) {
-            throw new LogicException(sprintf('Command class "%s" is not correctly initialized. You probably forgot to call the parent constructor.', static::class));
-        }
-
         return $this->definition;
     }
 
@@ -440,6 +425,8 @@ class Command
      * This feature should be used only when creating a long process command,
      * like a daemon.
      *
+     * PHP 5.5+ or the proctitle PECL library is required
+     *
      * @param string $title The process title
      *
      * @return $this
@@ -454,7 +441,7 @@ class Command
     /**
      * Returns the command name.
      *
-     * @return string|null
+     * @return string The command name
      */
     public function getName()
     {
@@ -564,7 +551,7 @@ class Command
     public function setAliases($aliases)
     {
         if (!\is_array($aliases) && !$aliases instanceof \Traversable) {
-            throw new InvalidArgumentException('$aliases must be an array or an instance of \Traversable.');
+            throw new InvalidArgumentException('$aliases must be an array or an instance of \Traversable');
         }
 
         foreach ($aliases as $alias) {

@@ -33,8 +33,7 @@ class ExportCustomJobInstance extends InstanceResource {
      *
      * @param Version $version Version that contains the resource
      * @param mixed[] $payload The response payload
-     * @param string $resourceType The type of communication – Messages, Calls,
-     *                             Conferences, and Participants
+     * @param string $resourceType The type of communication – Messages, Calls
      */
     public function __construct(Version $version, array $payload, string $resourceType) {
         parent::__construct($version);

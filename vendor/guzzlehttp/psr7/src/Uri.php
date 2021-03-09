@@ -1,5 +1,4 @@
 <?php
-
 namespace GuzzleHttp\Psr7;
 
 use Psr\Http\Message\UriInterface;
@@ -438,9 +437,9 @@ class Uri implements UriInterface
 
     public function withUserInfo($user, $password = null)
     {
-        $info = $this->filterUserInfoComponent($user);
-        if ($password !== null) {
-            $info .= ':' . $this->filterUserInfoComponent($password);
+        $info = $user;
+        if ($password != '') {
+            $info .= ':' . $password;
         }
 
         if ($this->userInfo === $info) {
@@ -538,9 +537,7 @@ class Uri implements UriInterface
         $this->scheme = isset($parts['scheme'])
             ? $this->filterScheme($parts['scheme'])
             : '';
-        $this->userInfo = isset($parts['user'])
-            ? $this->filterUserInfoComponent($parts['user'])
-            : '';
+        $this->userInfo = isset($parts['user']) ? $parts['user'] : '';
         $this->host = isset($parts['host'])
             ? $this->filterHost($parts['host'])
             : '';
@@ -557,7 +554,7 @@ class Uri implements UriInterface
             ? $this->filterQueryAndFragment($parts['fragment'])
             : '';
         if (isset($parts['pass'])) {
-            $this->userInfo .= ':' . $this->filterUserInfoComponent($parts['pass']);
+            $this->userInfo .= ':' . $parts['pass'];
         }
 
         $this->removeDefaultPort();
@@ -577,26 +574,6 @@ class Uri implements UriInterface
         }
 
         return strtolower($scheme);
-    }
-
-    /**
-     * @param string $component
-     *
-     * @return string
-     *
-     * @throws \InvalidArgumentException If the user info is invalid.
-     */
-    private function filterUserInfoComponent($component)
-    {
-        if (!is_string($component)) {
-            throw new \InvalidArgumentException('User info must be a string');
-        }
-
-        return preg_replace_callback(
-            '/(?:[^%' . self::$charUnreserved . self::$charSubDelims . ']+|%(?![A-Fa-f0-9]{2}))/',
-            [$this, 'rawurlencodeMatchZero'],
-            $component
-        );
     }
 
     /**
@@ -629,9 +606,9 @@ class Uri implements UriInterface
         }
 
         $port = (int) $port;
-        if (0 > $port || 0xffff < $port) {
+        if (1 > $port || 0xffff < $port) {
             throw new \InvalidArgumentException(
-                sprintf('Invalid port: %d. Must be between 0 and 65535', $port)
+                sprintf('Invalid port: %d. Must be between 1 and 65535', $port)
             );
         }
 

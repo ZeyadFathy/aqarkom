@@ -12,6 +12,9 @@ namespace Twilio\Rest\Sync\V1\Service\SyncList;
 use Twilio\Options;
 use Twilio\Values;
 
+/**
+ * PLEASE NOTE that this class contains beta products that are subject to change. Use them with caution.
+ */
 abstract class SyncListItemOptions {
     /**
      * @param string $ifMatch The If-Match HTTP request header
@@ -67,7 +70,7 @@ class DeleteSyncListItemOptions extends Options {
     }
 
     /**
-     * If provided, applies this mutation if (and only if) the “revision” field of this [map item] matches the provided value. This matches the semantics of (and is implemented with) the HTTP [If-Match header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Match).
+     * The If-Match HTTP request header
      *
      * @param string $ifMatch The If-Match HTTP request header
      * @return $this Fluent Builder
@@ -223,7 +226,7 @@ class UpdateSyncListItemOptions extends Options {
     }
 
     /**
-     * A JSON string that represents an arbitrary, schema-less object that the List Item stores. Can be up to 16 KiB in length.
+     * A JSON string that represents an arbitrary, schema-less object that the List Item stores. Can be up to 16KB in length.
      *
      * @param array $data A JSON string that represents an arbitrary, schema-less
      *                    object that the List Item stores
@@ -269,7 +272,7 @@ class UpdateSyncListItemOptions extends Options {
     }
 
     /**
-     * If provided, applies this mutation if (and only if) the “revision” field of this [map item] matches the provided value. This matches the semantics of (and is implemented with) the HTTP [If-Match header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Match).
+     * The If-Match HTTP request header
      *
      * @param string $ifMatch The If-Match HTTP request header
      * @return $this Fluent Builder

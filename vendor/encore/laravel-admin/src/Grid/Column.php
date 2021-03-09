@@ -3,25 +3,15 @@
 namespace Encore\Admin\Grid;
 
 use Closure;
-use Encore\Admin\Actions\RowAction;
 use Encore\Admin\Grid;
 use Encore\Admin\Grid\Displayers\AbstractDisplayer;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Database\Eloquent\Model as BaseModel;
-use Illuminate\Support\Arr;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class Column
 {
-    use Column\HasHeader;
-    use Column\InlineEditing;
-    use Column\ExtendDisplay;
-
-    const SELECT_COLUMN_NAME = '__row_selector__';
-
-    const ACTION_COLUMN_NAME = '__actions__';
-
     /**
      * @var Grid
      */
@@ -47,6 +37,20 @@ class Column
      * @var mixed
      */
     protected $original;
+
+    /**
+     * Is column sortable.
+     *
+     * @var bool
+     */
+    protected $sortable = false;
+
+    /**
+     * Sort arguments.
+     *
+     * @var array
+     */
+    protected $sort;
 
     /**
      * Attributes of column.
@@ -82,6 +86,13 @@ class Column
     protected $displayCallbacks = [];
 
     /**
+     * Displayers for grid column.
+     *
+     * @var array
+     */
+    public static $displayers = [];
+
+    /**
      * Defined columns.
      *
      * @var array
@@ -94,14 +105,11 @@ class Column
     protected static $htmlAttributes = [];
 
     /**
-     * @var array
-     */
-    protected static $rowAttributes = [];
-
-    /**
      * @var Model
      */
     protected static $model;
+
+    const SELECT_COLUMN_NAME = '__row_selector__';
 
     /**
      * @param string $name
@@ -112,18 +120,17 @@ class Column
         $this->name = $name;
 
         $this->label = $this->formatLabel($label);
-
-        $this->initAttributes();
     }
 
     /**
-     * Initialize column attributes.
+     * Extend column displayer.
+     *
+     * @param $name
+     * @param $displayer
      */
-    protected function initAttributes()
+    public static function extend($name, $displayer)
     {
-        $name = str_replace('.', '-', $this->name);
-
-        $this->setAttributes(['class' => "column-{$name}"]);
+        static::$displayers[$name] = $displayer;
     }
 
     /**
@@ -156,7 +163,7 @@ class Column
      */
     public function setModel($model)
     {
-        if (is_null(static::$model) && ($model instanceof BaseModel)) {
+        if (is_null(static::$model) && ($model instanceof Model)) {
             static::$model = $model->newInstance();
         }
     }
@@ -178,21 +185,9 @@ class Column
      *
      * @return $this
      */
-    public function setAttributes($attributes = [], $key = null)
+    public function setAttributes($attributes = [])
     {
-        if ($key) {
-            static::$rowAttributes[$this->name][$key] = array_merge(
-                Arr::get(static::$rowAttributes, "{$this->name}.{$key}", []),
-                $attributes
-            );
-
-            return $this;
-        }
-
-        static::$htmlAttributes[$this->name] = array_merge(
-            Arr::get(static::$htmlAttributes, $this->name, []),
-            $attributes
-        );
+        static::$htmlAttributes[$this->name] = $attributes;
 
         return $this;
     }
@@ -204,32 +199,9 @@ class Column
      *
      * @return mixed
      */
-    public static function getAttributes($name, $key = null)
+    public static function getAttributes($name)
     {
-        $rowAttributes = [];
-
-        if ($key && Arr::has(static::$rowAttributes, "{$name}.{$key}")) {
-            $rowAttributes = Arr::get(static::$rowAttributes, "{$name}.{$key}", []);
-        }
-
-        $columnAttributes = Arr::get(static::$htmlAttributes, $name, []);
-
-        return array_merge($rowAttributes, $columnAttributes);
-    }
-
-    /**
-     * Format attributes to html.
-     *
-     * @return string
-     */
-    public function formatHtmlAttributes()
-    {
-        $attrArr = [];
-        foreach (static::getAttributes($this->name) as $name => $val) {
-            $attrArr[] = "$name=\"$val\"";
-        }
-
-        return implode(' ', $attrArr);
+        return array_get(static::$htmlAttributes, $name, '');
     }
 
     /**
@@ -237,45 +209,11 @@ class Column
      *
      * @param string $style
      *
-     * @return $this
+     * @return Column
      */
     public function style($style)
     {
         return $this->setAttributes(compact('style'));
-    }
-
-    /**
-     * Set the width of column.
-     *
-     * @param int $width
-     *
-     * @return $this
-     */
-    public function width(int $width)
-    {
-        return $this->style("width: {$width}px;max-width: {$width}px;word-wrap: break-word;word-break: normal;");
-    }
-
-    /**
-     * Set the color of column.
-     *
-     * @param string $color
-     *
-     * @return $this
-     */
-    public function color($color)
-    {
-        return $this->style("color:$color;");
-    }
-
-    /**
-     * Get original column value.
-     *
-     * @return mixed
-     */
-    public function getOriginal()
-    {
-        return $this->original;
     }
 
     /**
@@ -289,16 +227,6 @@ class Column
     }
 
     /**
-     * @return string
-     */
-    public function getClassName()
-    {
-        $name = str_replace('.', '-', $this->getName());
-
-        return "column-{$name}";
-    }
-
-    /**
      * Format label.
      *
      * @param $label
@@ -307,13 +235,9 @@ class Column
      */
     protected function formatLabel($label)
     {
-        if ($label) {
-            return $label;
-        }
+        $label = $label ?: ucfirst($this->name);
 
-        $label = ucfirst($this->name);
-
-        return __(str_replace(['.', '_'], ' ', $label));
+        return str_replace(['.', '_'], ' ', $label);
     }
 
     /**
@@ -353,53 +277,27 @@ class Column
     }
 
     /**
-     * Mark this column as sortable.
+     * Set sort value.
      *
-     * @param null|string $cast
+     * @param bool $sort
      *
-     * @return Column|string
+     * @return Column
      */
-    public function sortable($cast = null)
+    public function sort($sort)
     {
-        return $this->addSorter($cast);
-    }
-
-    /**
-     * Set cast name for sortable.
-     *
-     * @return $this
-     *
-     * @deprecated Use `$column->sortable($cast)` instead.
-     */
-    public function cast($cast)
-    {
-        $this->cast = $cast;
+        $this->sortable = $sort;
 
         return $this;
     }
 
     /**
-     * Set help message for column.
+     * Mark this column as sortable.
      *
-     * @param string $help
-     *
-     * @return $this|string
+     * @return Column
      */
-    public function help($help = '')
+    public function sortable()
     {
-        return $this->addHelp($help);
-    }
-
-    /**
-     * Set column filter.
-     *
-     * @param mixed|null $builder
-     *
-     * @return $this
-     */
-    public function filter($builder = null)
-    {
-        return $this->addFilter(...func_get_args());
+        return $this->sort(true);
     }
 
     /**
@@ -422,7 +320,7 @@ class Column
      * @param string $abstract
      * @param array  $arguments
      *
-     * @return $this
+     * @return Column
      */
     public function displayUsing($abstract, $arguments = [])
     {
@@ -439,55 +337,37 @@ class Column
     }
 
     /**
-     * Hide this column by default.
+     * Display column using array value map.
+     *
+     * @param array $values
+     * @param null  $default
      *
      * @return $this
      */
-    public function hide()
+    public function using(array $values, $default = null)
     {
-        $this->grid->hideColumns($this->getName());
+        return $this->display(function ($value) use ($values, $default) {
+            if (is_null($value)) {
+                return $default;
+            }
 
-        return $this;
+            return array_get($values, $value, $default);
+        });
     }
 
     /**
-     * Add column to total-row.
+     * Render this column with the given view.
      *
-     * @param null $display
-     *
-     * @return $this
-     */
-    public function totalRow($display = null)
-    {
-        $this->grid->addTotalRow($this->name, $display);
-
-        return $this;
-    }
-
-    /**
-     * Display column using a grid row action.
-     *
-     * @param string $action
+     * @param string $view
      *
      * @return $this
      */
-    public function action($action)
+    public function view($view)
     {
-        if (!is_subclass_of($action, RowAction::class)) {
-            throw new \InvalidArgumentException("Action class [$action] must be sub-class of [Encore\Admin\Actions\GridAction]");
-        }
+        return $this->display(function ($value) use ($view) {
+            $model = $this;
 
-        $grid = $this->grid;
-
-        return $this->display(function ($_, $column) use ($action, $grid) {
-            /** @var RowAction $action */
-            $action = new $action();
-
-            return $action
-                ->asColumn()
-                ->setGrid($grid)
-                ->setColumn($column)
-                ->setRow($this);
+            return view($view, compact('model', 'value'))->render();
         });
     }
 
@@ -521,7 +401,7 @@ class Column
                 ($last = array_pop($this->displayCallbacks))
             ) {
                 $last = $this->bindOriginalRowModel($last, $key);
-                $value = call_user_func_array($last, [$previous, $this]);
+                $value = call_user_func($last, $previous);
             }
         }
 
@@ -553,11 +433,11 @@ class Column
     public function fill(array $data)
     {
         foreach ($data as $key => &$row) {
-            $this->original = $value = Arr::get($row, $this->name);
+            $this->original = $value = array_get($row, $this->name);
 
             $value = $this->htmlEntityEncode($value);
 
-            Arr::set($row, $this->name, $value);
+            array_set($row, $this->name, $value);
 
             if ($this->isDefinedColumn()) {
                 $this->useDefinedColumn();
@@ -565,7 +445,7 @@ class Column
 
             if ($this->hasDisplayCallbacks()) {
                 $value = $this->callDisplayCallbacks($this->original, $key);
-                Arr::set($row, $this->name, $value);
+                array_set($row, $this->name, $value);
             }
         }
 
@@ -636,12 +516,55 @@ class Column
     }
 
     /**
+     * Create the column sorter.
+     *
+     * @return string
+     */
+    public function sorter()
+    {
+        if (!$this->sortable) {
+            return '';
+        }
+
+        $icon = 'fa-sort';
+        $type = 'desc';
+
+        if ($this->isSorted()) {
+            $type = $this->sort['type'] == 'desc' ? 'asc' : 'desc';
+            $icon .= "-amount-{$this->sort['type']}";
+        }
+
+        $query = app('request')->all();
+        $query = array_merge($query, [$this->grid->model()->getSortName() => ['column' => $this->name, 'type' => $type]]);
+
+        $url = url()->current().'?'.http_build_query($query);
+
+        return "<a class=\"fa fa-fw $icon\" href=\"$url\"></a>";
+    }
+
+    /**
+     * Determine if this column is currently sorted.
+     *
+     * @return bool
+     */
+    protected function isSorted()
+    {
+        $this->sort = app('request')->get($this->grid->model()->getSortName());
+
+        if (empty($this->sort)) {
+            return false;
+        }
+
+        return isset($this->sort['column']) && $this->sort['column'] == $this->name;
+    }
+
+    /**
      * Find a displayer to display column.
      *
      * @param string $abstract
      * @param array  $arguments
      *
-     * @return $this
+     * @return Column
      */
     protected function resolveDisplayer($abstract, $arguments)
     {
@@ -658,7 +581,7 @@ class Column
      * @param string $abstract
      * @param array  $arguments
      *
-     * @return $this
+     * @return Column
      */
     protected function callSupportDisplayer($abstract, $arguments)
     {
@@ -681,7 +604,7 @@ class Column
      * @param string $abstract
      * @param array  $arguments
      *
-     * @return $this
+     * @return Column
      */
     protected function callBuiltinDisplayer($abstract, $arguments)
     {
@@ -720,7 +643,7 @@ class Column
     {
         if ($this->isRelation() && !$this->relationColumn) {
             $this->name = "{$this->relation}.$method";
-            $this->label = $this->formatLabel($arguments[0] ?? null);
+            $this->label = isset($arguments[0]) ? $arguments[0] : ucfirst($method);
 
             $this->relationColumn = $method;
 

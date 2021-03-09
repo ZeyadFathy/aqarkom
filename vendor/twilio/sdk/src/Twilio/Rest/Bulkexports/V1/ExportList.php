@@ -50,8 +50,7 @@ class ExportList extends ListResource {
     /**
      * Constructs a ExportContext
      *
-     * @param string $resourceType The type of communication – Messages, Calls,
-     *                             Conferences, and Participants
+     * @param string $resourceType The type of communication – Messages, Calls
      */
     public function getContext(string $resourceType): ExportContext {
         return new ExportContext($this->version, $resourceType);

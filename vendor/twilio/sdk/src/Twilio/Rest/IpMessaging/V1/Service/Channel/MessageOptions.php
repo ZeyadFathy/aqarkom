@@ -14,8 +14,9 @@ use Twilio\Values;
 
 abstract class MessageOptions {
     /**
-     * @param string $from The from
-     * @param string $attributes The attributes
+     * @param string $from The identity of the new message's author
+     * @param string $attributes A valid JSON string that contains
+     *                           application-specific data
      * @return CreateMessageOptions Options builder
      */
     public static function create(string $from = Values::NONE, string $attributes = Values::NONE): CreateMessageOptions {
@@ -23,7 +24,7 @@ abstract class MessageOptions {
     }
 
     /**
-     * @param string $order The order
+     * @param string $order The sort order of the returned messages
      * @return ReadMessageOptions Options builder
      */
     public static function read(string $order = Values::NONE): ReadMessageOptions {
@@ -31,8 +32,9 @@ abstract class MessageOptions {
     }
 
     /**
-     * @param string $body The body
-     * @param string $attributes The attributes
+     * @param string $body The message to send to the channel
+     * @param string $attributes A valid JSON string that contains
+     *                           application-specific data
      * @return UpdateMessageOptions Options builder
      */
     public static function update(string $body = Values::NONE, string $attributes = Values::NONE): UpdateMessageOptions {
@@ -42,8 +44,9 @@ abstract class MessageOptions {
 
 class CreateMessageOptions extends Options {
     /**
-     * @param string $from The from
-     * @param string $attributes The attributes
+     * @param string $from The identity of the new message's author
+     * @param string $attributes A valid JSON string that contains
+     *                           application-specific data
      */
     public function __construct(string $from = Values::NONE, string $attributes = Values::NONE) {
         $this->options['from'] = $from;
@@ -51,9 +54,9 @@ class CreateMessageOptions extends Options {
     }
 
     /**
-     * The from
+     * The [identity](https://www.twilio.com/docs/api/chat/guides/identity) of the new message's author. The default value is `system`.
      *
-     * @param string $from The from
+     * @param string $from The identity of the new message's author
      * @return $this Fluent Builder
      */
     public function setFrom(string $from): self {
@@ -62,9 +65,10 @@ class CreateMessageOptions extends Options {
     }
 
     /**
-     * The attributes
+     * A valid JSON string that contains application-specific data.
      *
-     * @param string $attributes The attributes
+     * @param string $attributes A valid JSON string that contains
+     *                           application-specific data
      * @return $this Fluent Builder
      */
     public function setAttributes(string $attributes): self {
@@ -85,16 +89,16 @@ class CreateMessageOptions extends Options {
 
 class ReadMessageOptions extends Options {
     /**
-     * @param string $order The order
+     * @param string $order The sort order of the returned messages
      */
     public function __construct(string $order = Values::NONE) {
         $this->options['order'] = $order;
     }
 
     /**
-     * The order
+     * The sort order of the returned messages. Can be: `asc` (ascending) or `desc` (descending) with `asc` as the default.
      *
-     * @param string $order The order
+     * @param string $order The sort order of the returned messages
      * @return $this Fluent Builder
      */
     public function setOrder(string $order): self {
@@ -115,8 +119,9 @@ class ReadMessageOptions extends Options {
 
 class UpdateMessageOptions extends Options {
     /**
-     * @param string $body The body
-     * @param string $attributes The attributes
+     * @param string $body The message to send to the channel
+     * @param string $attributes A valid JSON string that contains
+     *                           application-specific data
      */
     public function __construct(string $body = Values::NONE, string $attributes = Values::NONE) {
         $this->options['body'] = $body;
@@ -124,9 +129,9 @@ class UpdateMessageOptions extends Options {
     }
 
     /**
-     * The body
+     * The message to send to the channel. Can also be an empty string or `null`, which sets the value as an empty string. You can send structured data in the body by serializing it as a string.
      *
-     * @param string $body The body
+     * @param string $body The message to send to the channel
      * @return $this Fluent Builder
      */
     public function setBody(string $body): self {
@@ -135,9 +140,10 @@ class UpdateMessageOptions extends Options {
     }
 
     /**
-     * The attributes
+     * A valid JSON string that contains application-specific data.
      *
-     * @param string $attributes The attributes
+     * @param string $attributes A valid JSON string that contains
+     *                           application-specific data
      * @return $this Fluent Builder
      */
     public function setAttributes(string $attributes): self {

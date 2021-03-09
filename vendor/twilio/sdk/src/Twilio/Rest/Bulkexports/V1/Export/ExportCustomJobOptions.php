@@ -17,44 +17,126 @@ use Twilio\Values;
  */
 abstract class ExportCustomJobOptions {
     /**
-     * @param string $webhookUrl The optional webhook url called on completion of
-     *                           the job. If this is supplied, `WebhookMethod` must
-     *                           also be supplied.
-     * @param string $webhookMethod This is the method used to call the webhook on
-     *                              completion of the job. If this is supplied,
-     *                              `WebhookUrl` must also be supplied.
-     * @param string $email The optional email to send the completion notification
-     *                      to
+     * @param string $nextToken The token for the next page of job results
+     * @param string $previousToken The token for the previous page of result
+     * @return ReadExportCustomJobOptions Options builder
+     */
+    public static function read(string $nextToken = Values::NONE, string $previousToken = Values::NONE): ReadExportCustomJobOptions {
+        return new ReadExportCustomJobOptions($nextToken, $previousToken);
+    }
+
+    /**
+     * @param string $friendlyName The friendly_name
+     * @param string $startDay The start_day
+     * @param string $endDay The end_day
+     * @param string $webhookUrl The webhook_url
+     * @param string $webhookMethod The webhook_method
+     * @param string $email The email
      * @return CreateExportCustomJobOptions Options builder
      */
-    public static function create(string $webhookUrl = Values::NONE, string $webhookMethod = Values::NONE, string $email = Values::NONE): CreateExportCustomJobOptions {
-        return new CreateExportCustomJobOptions($webhookUrl, $webhookMethod, $email);
+    public static function create(string $friendlyName = Values::NONE, string $startDay = Values::NONE, string $endDay = Values::NONE, string $webhookUrl = Values::NONE, string $webhookMethod = Values::NONE, string $email = Values::NONE): CreateExportCustomJobOptions {
+        return new CreateExportCustomJobOptions($friendlyName, $startDay, $endDay, $webhookUrl, $webhookMethod, $email);
+    }
+}
+
+class ReadExportCustomJobOptions extends Options {
+    /**
+     * @param string $nextToken The token for the next page of job results
+     * @param string $previousToken The token for the previous page of result
+     */
+    public function __construct(string $nextToken = Values::NONE, string $previousToken = Values::NONE) {
+        $this->options['nextToken'] = $nextToken;
+        $this->options['previousToken'] = $previousToken;
+    }
+
+    /**
+     * The token for the next page of job results, and may be null if there are no more pages
+     *
+     * @param string $nextToken The token for the next page of job results
+     * @return $this Fluent Builder
+     */
+    public function setNextToken(string $nextToken): self {
+        $this->options['nextToken'] = $nextToken;
+        return $this;
+    }
+
+    /**
+     * The token for the previous page of results, and may be null if this is the first page
+     *
+     * @param string $previousToken The token for the previous page of result
+     * @return $this Fluent Builder
+     */
+    public function setPreviousToken(string $previousToken): self {
+        $this->options['previousToken'] = $previousToken;
+        return $this;
+    }
+
+    /**
+     * Provide a friendly representation
+     *
+     * @return string Machine friendly representation
+     */
+    public function __toString(): string {
+        $options = \http_build_query(Values::of($this->options), '', ' ');
+        return '[Twilio.Bulkexports.V1.ReadExportCustomJobOptions ' . $options . ']';
     }
 }
 
 class CreateExportCustomJobOptions extends Options {
     /**
-     * @param string $webhookUrl The optional webhook url called on completion of
-     *                           the job. If this is supplied, `WebhookMethod` must
-     *                           also be supplied.
-     * @param string $webhookMethod This is the method used to call the webhook on
-     *                              completion of the job. If this is supplied,
-     *                              `WebhookUrl` must also be supplied.
-     * @param string $email The optional email to send the completion notification
-     *                      to
+     * @param string $friendlyName The friendly_name
+     * @param string $startDay The start_day
+     * @param string $endDay The end_day
+     * @param string $webhookUrl The webhook_url
+     * @param string $webhookMethod The webhook_method
+     * @param string $email The email
      */
-    public function __construct(string $webhookUrl = Values::NONE, string $webhookMethod = Values::NONE, string $email = Values::NONE) {
+    public function __construct(string $friendlyName = Values::NONE, string $startDay = Values::NONE, string $endDay = Values::NONE, string $webhookUrl = Values::NONE, string $webhookMethod = Values::NONE, string $email = Values::NONE) {
+        $this->options['friendlyName'] = $friendlyName;
+        $this->options['startDay'] = $startDay;
+        $this->options['endDay'] = $endDay;
         $this->options['webhookUrl'] = $webhookUrl;
         $this->options['webhookMethod'] = $webhookMethod;
         $this->options['email'] = $email;
     }
 
     /**
-     * The optional webhook url called on completion of the job. If this is supplied, `WebhookMethod` must also be supplied. If you set neither webhook nor email, you will have to check your job's status manually.
+     * The friendly_name
      *
-     * @param string $webhookUrl The optional webhook url called on completion of
-     *                           the job. If this is supplied, `WebhookMethod` must
-     *                           also be supplied.
+     * @param string $friendlyName The friendly_name
+     * @return $this Fluent Builder
+     */
+    public function setFriendlyName(string $friendlyName): self {
+        $this->options['friendlyName'] = $friendlyName;
+        return $this;
+    }
+
+    /**
+     * The start_day
+     *
+     * @param string $startDay The start_day
+     * @return $this Fluent Builder
+     */
+    public function setStartDay(string $startDay): self {
+        $this->options['startDay'] = $startDay;
+        return $this;
+    }
+
+    /**
+     * The end_day
+     *
+     * @param string $endDay The end_day
+     * @return $this Fluent Builder
+     */
+    public function setEndDay(string $endDay): self {
+        $this->options['endDay'] = $endDay;
+        return $this;
+    }
+
+    /**
+     * The webhook_url
+     *
+     * @param string $webhookUrl The webhook_url
      * @return $this Fluent Builder
      */
     public function setWebhookUrl(string $webhookUrl): self {
@@ -63,11 +145,9 @@ class CreateExportCustomJobOptions extends Options {
     }
 
     /**
-     * This is the method used to call the webhook on completion of the job. If this is supplied, `WebhookUrl` must also be supplied.
+     * The webhook_method
      *
-     * @param string $webhookMethod This is the method used to call the webhook on
-     *                              completion of the job. If this is supplied,
-     *                              `WebhookUrl` must also be supplied.
+     * @param string $webhookMethod The webhook_method
      * @return $this Fluent Builder
      */
     public function setWebhookMethod(string $webhookMethod): self {
@@ -76,10 +156,9 @@ class CreateExportCustomJobOptions extends Options {
     }
 
     /**
-     * The optional email to send the completion notification to. You can set both webhook, and email, or one or the other. If you set neither, the job will run but you will have to query to determine your job's status.
+     * The email
      *
-     * @param string $email The optional email to send the completion notification
-     *                      to
+     * @param string $email The email
      * @return $this Fluent Builder
      */
     public function setEmail(string $email): self {

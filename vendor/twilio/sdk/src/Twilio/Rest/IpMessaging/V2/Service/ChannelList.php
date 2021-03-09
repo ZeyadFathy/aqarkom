@@ -22,7 +22,8 @@ class ChannelList extends ListResource {
      * Construct the ChannelList
      *
      * @param Version $version Version that contains the resource
-     * @param string $serviceSid The service_sid
+     * @param string $serviceSid The SID of the Service that the resource is
+     *                           associated with
      */
     public function __construct(Version $version, string $serviceSid) {
         parent::__construct($version);
@@ -150,7 +151,7 @@ class ChannelList extends ListResource {
     /**
      * Constructs a ChannelContext
      *
-     * @param string $sid The sid
+     * @param string $sid The SID of the resource
      */
     public function getContext(string $sid): ChannelContext {
         return new ChannelContext($this->version, $this->solution['serviceSid'], $sid);

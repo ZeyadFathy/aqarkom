@@ -3,8 +3,6 @@
 namespace Encore\Admin\Form;
 
 use Encore\Admin\Form;
-use Encore\Admin\Widgets\Form as WidgetForm;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 /**
@@ -53,7 +51,7 @@ use Illuminate\Support\Collection;
 class EmbeddedForm
 {
     /**
-     * @var Form|WidgetForm
+     * @var Form
      */
     protected $parent = null;
 
@@ -108,20 +106,6 @@ class EmbeddedForm
      * @return $this
      */
     public function setParent(Form $parent)
-    {
-        $this->parent = $parent;
-
-        return $this;
-    }
-
-    /**
-     * Set parent form for this form.
-     *
-     * @param WidgetForm $parent
-     *
-     * @return $this
-     */
-    public function setParentWidgetForm(WidgetForm $parent)
     {
         $this->parent = $parent;
 
@@ -281,16 +265,12 @@ class EmbeddedForm
     public function __call($method, $arguments)
     {
         if ($className = Form::findFieldClass($method)) {
-            $column = Arr::get($arguments, 0, '');
+            $column = array_get($arguments, 0, '');
 
             /** @var Field $field */
             $field = new $className($column, array_slice($arguments, 1));
 
-            if ($this->parent instanceof WidgetForm) {
-                $field->setWidgetForm($this->parent);
-            } else {
-                $field->setForm($this->parent);
-            }
+            $field->setForm($this->parent);
 
             $this->pushField($field);
 
