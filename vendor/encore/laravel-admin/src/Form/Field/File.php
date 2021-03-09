@@ -3,12 +3,13 @@
 namespace Encore\Admin\Form\Field;
 
 use Encore\Admin\Form\Field;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Arr;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class File extends Field
 {
     use UploadField;
+    use HasValuePicker;
 
     /**
      * Css.
@@ -76,7 +77,7 @@ class File extends Field
         /*
          * Make input data validatable if the column data is `null`.
          */
-        if (array_has($input, $this->column) && is_null(array_get($input, $this->column))) {
+        if (Arr::has($input, $this->column) && is_null(Arr::get($input, $this->column))) {
             $input[$this->column] = '';
         }
 
@@ -89,7 +90,7 @@ class File extends Field
         $rules[$this->column] = $fieldRules;
         $attributes[$this->column] = $this->label;
 
-        return Validator::make($input, $rules, $this->validationMessages, $attributes);
+        return \validator($input, $rules, $this->getValidationMessages(), $attributes);
     }
 
     /**
@@ -101,6 +102,10 @@ class File extends Field
      */
     public function prepare($file)
     {
+        if ($this->picker) {
+            return parent::prepare($file);
+        }
+
         if (request()->has(static::FILE_DELETE_FLAG)) {
             return $this->destroy();
         }
@@ -123,8 +128,8 @@ class File extends Field
 
         $path = null;
 
-        if (!is_null($this->storage_permission)) {
-            $path = $this->storage->putFileAs($this->getDirectory(), $file, $this->name, $this->storage_permission);
+        if (!is_null($this->storagePermission)) {
+            $path = $this->storage->putFileAs($this->getDirectory(), $file, $this->name, $this->storagePermission);
         } else {
             $path = $this->storage->putFileAs($this->getDirectory(), $file, $this->name);
         }
@@ -145,6 +150,18 @@ class File extends Field
     }
 
     /**
+     * Hides the file preview.
+     *
+     * @return $this
+     */
+    public function hidePreview()
+    {
+        return $this->options([
+            'showPreview' => false,
+        ]);
+    }
+
+    /**
      * Initialize the caption.
      *
      * @param string $caption
@@ -161,9 +178,54 @@ class File extends Field
      */
     protected function initialPreviewConfig()
     {
-        return [
-            ['caption' => basename($this->value), 'key' => 0],
-        ];
+        $config = ['caption' => basename($this->value), 'key' => 0];
+
+        $config = array_merge($config, $this->guessPreviewType($this->value));
+
+        return [$config];
+    }
+
+    /**
+     * @param string $options
+     */
+    protected function setupScripts($options)
+    {
+        $this->script = <<<EOT
+$("input{$this->getElementClassSelector()}").fileinput({$options});
+EOT;
+
+        if ($this->fileActionSettings['showRemove']) {
+            $text = [
+                'title'   => trans('admin.delete_confirm'),
+                'confirm' => trans('admin.confirm'),
+                'cancel'  => trans('admin.cancel'),
+            ];
+
+            $this->script .= <<<EOT
+$("input{$this->getElementClassSelector()}").on('filebeforedelete', function() {
+
+    return new Promise(function(resolve, reject) {
+
+        var remove = resolve;
+
+        swal({
+            title: "{$text['title']}",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "{$text['confirm']}",
+            showLoaderOnConfirm: true,
+            cancelButtonText: "{$text['cancel']}",
+            preConfirm: function() {
+                return new Promise(function(resolve) {
+                    resolve(remove());
+                });
+            }
+        });
+    });
+});
+EOT;
+        }
     }
 
     /**
@@ -173,23 +235,29 @@ class File extends Field
      */
     public function render()
     {
-        $this->options(['overwriteInitial' => true]);
+        if ($this->picker) {
+            return $this->renderFilePicker();
+        }
+
+        $this->options(['overwriteInitial' => true, 'msgPlaceholder' => trans('admin.choose_file')]);
+
         $this->setupDefaultOptions();
 
         if (!empty($this->value)) {
-            $this->attribute('data-initial-preview', filter_var($this->preview(), FILTER_VALIDATE_URL));
+            $this->attribute('data-initial-preview', $this->preview());
             $this->attribute('data-initial-caption', $this->initialCaption($this->value));
 
             $this->setupPreviewOptions();
+            /*
+             * If has original value, means the form is in edit mode,
+             * then remove required rule from rules.
+             */
+            unset($this->attributes['required']);
         }
 
-        $options = json_encode($this->options);
+        $options = json_encode_options($this->options);
 
-        $this->script = <<<EOT
-
-$("input{$this->getElementClassSelector()}").fileinput({$options});
-
-EOT;
+        $this->setupScripts($options);
 
         return parent::render();
     }

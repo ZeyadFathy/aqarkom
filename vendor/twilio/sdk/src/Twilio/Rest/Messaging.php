@@ -15,7 +15,11 @@ use Twilio\Rest\Messaging\V1;
 
 /**
  * @property \Twilio\Rest\Messaging\V1 $v1
+ * @property \Twilio\Rest\Messaging\V1\BrandRegistrationList $brandRegistrations
+ * @property \Twilio\Rest\Messaging\V1\DeactivationsList $deactivations
  * @property \Twilio\Rest\Messaging\V1\ServiceList $services
+ * @method \Twilio\Rest\Messaging\V1\BrandRegistrationContext brandRegistrations(string $sid)
+ * @method \Twilio\Rest\Messaging\V1\DeactivationsContext deactivations()
  * @method \Twilio\Rest\Messaging\V1\ServiceContext services(string $sid)
  */
 class Messaging extends Domain {
@@ -73,6 +77,25 @@ class Messaging extends Domain {
         }
 
         throw new TwilioException('Unknown context ' . $name);
+    }
+
+    protected function getBrandRegistrations(): \Twilio\Rest\Messaging\V1\BrandRegistrationList {
+        return $this->v1->brandRegistrations;
+    }
+
+    /**
+     * @param string $sid The SID that identifies the resource to fetch
+     */
+    protected function contextBrandRegistrations(string $sid): \Twilio\Rest\Messaging\V1\BrandRegistrationContext {
+        return $this->v1->brandRegistrations($sid);
+    }
+
+    protected function getDeactivations(): \Twilio\Rest\Messaging\V1\DeactivationsList {
+        return $this->v1->deactivations;
+    }
+
+    protected function contextDeactivations(): \Twilio\Rest\Messaging\V1\DeactivationsContext {
+        return $this->v1->deactivations();
     }
 
     protected function getServices(): \Twilio\Rest\Messaging\V1\ServiceList {

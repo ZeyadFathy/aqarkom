@@ -2,10 +2,13 @@
 
 namespace Encore\Admin\Widgets;
 
+use Encore\Admin\Facades\Admin;
 use Illuminate\Contracts\Support\Renderable;
 
 class Tab extends Widget implements Renderable
 {
+    use ContainsForms;
+
     const TYPE_CONTENT = 1;
     const TYPE_LINK = 2;
 
@@ -36,13 +39,14 @@ class Tab extends Widget implements Renderable
      * @param string            $title
      * @param string|Renderable $content
      * @param bool              $active
+     * @param string|null       $id
      *
      * @return $this
      */
-    public function add($title, $content, $active = false)
+    public function add($title, $content, $active = false, $id = null)
     {
         $this->data['tabs'][] = [
-            'id'      => mt_rand(),
+            'id'      => $id ?: mt_rand(),
             'title'   => $title,
             'content' => $content,
             'type'    => static::TYPE_CONTENT,
@@ -127,6 +131,27 @@ class Tab extends Widget implements Renderable
             ['attributes' => $this->formatAttributes()]
         );
 
+        $this->setupScript();
+
         return view($this->view, $data)->render();
+    }
+
+    /**
+     * Setup script.
+     */
+    protected function setupScript()
+    {
+        $script = <<<'SCRIPT'
+var hash = document.location.hash;
+if (hash) {
+    $('.nav-tabs a[href="' + hash + '"]').tab('show');
+}
+
+// Change hash for page-reload
+$('.nav-tabs a').on('shown.bs.tab', function (e) {
+    history.pushState(null,null, e.target.hash);
+});
+SCRIPT;
+        Admin::script($script);
     }
 }
